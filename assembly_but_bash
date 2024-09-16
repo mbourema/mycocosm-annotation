@@ -1,0 +1,25 @@
+#!/bin/bash
+
+###############################################################################################################################################################################
+# Script for lauching the assembly_but.py script for all genomes repertories, creating a diamond index from the amino acid sequences database, lauching a diamond blastx
+# with each genome CDS and the database and deleting the database and the index at each iteration. This bash script requires a list of genomes as environment variable
+###############################################################################################################################################################################
+
+#SBATCH --ntasks-per-node=40
+module load diamond
+
+
+# Chemin du script Python
+python_script="/home/mbourema/python/removing_sequences/second_approach/assembly_but.py"
+
+# Boucle sur les génomes
+
+while read genome ; do
+	# Exécution du script Python pour assembler et copier les fichiers
+	python "$python_script" "$genome"
+	# Création de la base de données Diamond
+	diamond makedb --in "/home/mbourema/mycocosm2024/mycocosm2024_purified/files_for_diamond/all_aa_but_${genome}.fasta.gz" -d "/home/mbourema/mycocosm2024/mycocosm2024_purified/files_for_diamonds2/${genome}.dmnd"
+	# Exécution de Diamond
+	diamond blastx --threads 40 --db "/home/mbourema/mycocosm2024/mycocosm2024_purified/files_for_diamonds2/${genome}.dmnd" -c1 --query "/home/mbourema/mycocosm2024/mycocosm2024_purified/files_for_diamond/${genome}_GeneCatalog"* --more-sensitive --out "/home/mbourema/mycocosm2024/mycocosm2024_purified/files_for_diamonds2/${genome}" --outfmt 6 qseqid sseqid stitle bitscore evalue pident --max-target-seqs 1 --max-hsps 1 --evalue 1e-3 --tmpdir /dev/shm --unal 1
+	rm "/home/mbourema/mycocosm2024/mycocosm2024_purified/files_for_diamond/all_aa_but_${genome}.fasta.gz" "/home/mbourema/mycocosm2024/mycocosm2024_purified/files_for_diamonds2/${genome}.dmnd"
+done<$1
