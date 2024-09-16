@@ -1,0 +1,198 @@
+###############################################################################################################################################################################################
+# Calculation of a table containing the percentages of good taxonomic, trophic and functionnal (KOG and SigP) predictions for each genomes. It takes a concatenated file
+# of all diamonds output as input, the fungal_trait database (tranformed by the script transform_fungaltrait.R), the concatenated file containing all KOG and SigP annotations. It creates the
+# table of percentages as output 
+###############################################################################################################################################################################################
+
+# Import of the data.table library for efficient manipulation of tabular data
+library(data.table)
+options(scipen = 999) # Désactivation de la notation scientifique pour les nombres décimaux
+### FUNCTIONS 
+# Function to import the diamond file as a table, add column names to it, import the fungal traits file, rename its columns and merge it with the diamond file via the "JGI_ID" columns (best hits identifier).
+import_diamond10_MycData <- function(diamond_Myc, fungal_traits_file) {
+  ## diamond file
+  MycAn <- fread(diamond_Myc) # Lecture du fichier diamond avec data.table
+  
+  ## Fungaltraits
+  portal_data <- fread(fungal_traits_file) # Lecture des données de traits fongiques avec data.table
+  
+  # Separation of  Myc_Hit
+  MycAn[, c("db", "JGI_ID", "ID", "descr") := tstrsplit(Myc_Hit, "|", fixed = TRUE, fill =NA, keep=c(1,2,3,4))]
+  
+  # Merging of the data by JGI_ID
+  MycFG <- merge(MycAn, portal_data, by = "JGI_ID", all.x = TRUE)
+  
+  # Renaming columns
+  setnames(MycFG, c("Phylum", "Class", "Order", "Family", "Genus", "primary_lifestyle", "Secondary_lifestyle"), 
+           c("pred_Phylum", "pred_Class", "pred_Order", "pred_Family", "pred_Genus", "pred_primary_lifestyle", "pred_Secondary_lifestyle"))
+  
+  # Add pred_guild column
+  MycFG[, pred_guild := fifelse(pred_primary_lifestyle %in% c("ectomycorrhizal"), "Ectomycorrhizal", 
+                                fifelse(pred_primary_lifestyle %in% c("soil_saprotroph","unspecified_saprotroph","litter_saprotroph",
+                                                                      "wood_saprotroph","dung_saprotroph","fungal_decomposer") | pred_Secondary_lifestyle %in% c("litter_saprotroph",
+                                                                                                                                             "unspecified_saprotroph","soil_saprotroph",
+                                                                                                                                             "wood_saprotroph","fungal_decomposer","dung_saprotroph"), 
+                                        "Saprotroph", fifelse(pred_primary_lifestyle %in% c("unspecified_pathotroph","plant_pathogen") | 
+                                                                pred_Secondary_lifestyle %in% c("plant_pathogen", "unspecified_pathotroph"), "Pathotroph", "Others")))]
+  
+  return(MycFG)
+}
+
+### import files
+# Diamond file of the genomes
+diamond <- import_diamond10_MycData("/home/mbourema/mycocosm2024/mycocosm2024_purified/concatenated_diamonds/all_diamonds_final_light", "/home/mbourema/mycocosm2024/mycocosm2024_purified/R_script/real_transformed_fungal")
+
+# Métadonnées des génomes fongiques
+fungal <- fread("/home/mbourema/mycocosm2024/mycocosm2024_purified/R_script/real_transformed_fungal")[, .(JGI_ID, Phylum, Class, Order, Family, Genus, primary_lifestyle, Secondary_lifestyle)][, 
+  guild := fifelse(
+    primary_lifestyle %in% c("ectomycorrhizal"), "Ectomycorrhizal", 
+    fifelse(
+      primary_lifestyle %in% c("soil_saprotroph", "unspecified_saprotroph", "litter_saprotroph", "wood_saprotroph", "dung_saprotroph") | 
+      Secondary_lifestyle %in% c("litter_saprotroph", "unspecified_saprotroph", "soil_saprotroph", "wood_saprotroph", "fungal_decomposer"), 
+      "Saprotroph", 
+      fifelse(
+        primary_lifestyle %in% c("unspecified_pathotroph", "plant_pathogen") | 
+        Secondary_lifestyle %in% c("plant_pathogen"), 
+        "Pathotroph", 
+        "Others"
+      )
+    )
+  )
+]
+
+# Read fungal trait data with data.table and select relevant columns
+setnames(fungal, c("JGI_ID"), c("exp_JGI_ID"))
+# sorting Life_style and guild
+final_data <- diamond[, c("jgi", "exp_JGI_ID", "ref_ID", "ref_descr") := tstrsplit(Myc_contig, "|", fixed=TRUE, keep=c(1,2,3,4))]
+final_data <- merge(final_data, fungal, by = "exp_JGI_ID")
+final_data[, compare_life_style := fifelse(is.na(JGI_ID), 'NO-HIT',
+                                           fifelse(
+                                             ((!is.na(pred_primary_lifestyle) & !is.na(primary_lifestyle)) &
+                                                pred_primary_lifestyle == primary_lifestyle) |
+                                               ((!is.na(pred_primary_lifestyle) & !is.na(Secondary_lifestyle)) & 
+                                                  pred_primary_lifestyle == Secondary_lifestyle) |
+                                               ((!is.na(pred_Secondary_lifestyle) & !is.na(primary_lifestyle)) &
+                                                  pred_Secondary_lifestyle == primary_lifestyle) |
+                                               ((!is.na(pred_Secondary_lifestyle) & !is.na(Secondary_lifestyle)) &
+                                                  pred_Secondary_lifestyle == Secondary_lifestyle) |
+                                               ((!is.na(Secondary_lifestyle) & !is.na(pred_primary_lifestyle)) &
+                                                  Secondary_lifestyle == pred_primary_lifestyle) |
+                                               ((!is.na(Secondary_lifestyle) & !is.na(pred_Secondary_lifestyle)) &
+                                                  Secondary_lifestyle == pred_Secondary_lifestyle) |
+                                               ((!is.na(primary_lifestyle) & !is.na(pred_primary_lifestyle)) &
+                                                  primary_lifestyle == pred_primary_lifestyle) |
+                                               ((!is.na(primary_lifestyle) & !is.na(pred_Secondary_lifestyle)) &
+                                                  primary_lifestyle == pred_Secondary_lifestyle),
+                                             'MATCH', 'NO-MATCH'
+                                           )
+)
+]
+final_data[, compare_guild := fifelse(is.na(JGI_ID), "NO-HIT", fifelse(pred_guild == guild, "correct_guild", "incorrect_guild"))] # Ajout de la colonne compare_guild
+final_data <- final_data[, .(exp_JGI_ID, compare_life_style, compare_guild)] # Sélection des colonnes pertinentes
+final_data[, alignments_count := 1] # Ajout de la colonne alignments_count avec une valeur de 1 pour chaque ligne
+final_data[, number_alignments := sum(alignments_count), by = exp_JGI_ID] # Ajout de la colonne number_alignments qui compte le nombre d'alignements pour chaque génome
+final_data[, total_na := sum(compare_life_style == 'NO-HIT'), by = exp_JGI_ID] # Ajout de la colonne total_na qui compte le nombre de 'NO-HIT' pour chaque génome
+final_data[, total_match := sum(compare_life_style == 'MATCH'), by = exp_JGI_ID] # Ajout de la colonne total_match qui compte le nombre de 'MATCH' pour chaque génome
+final_data[, percentage_life_style_match := (total_match/number_alignments)*100] # Ajout de la colonne percentage_life_style_match qui calcule le pourcentage de match pour chaque génome
+final_data[, percentage_na := (total_na/number_alignments)*100] # Ajout de la colonne percentage_na qui calcule le pourcentage de 'NO-HIT' pour chaque génome
+final_data[, total_no_hit := sum(compare_guild == "NO-HIT"), by = exp_JGI_ID]
+final_data[, total_match_guild := sum(compare_guild == "correct_guild"), by = exp_JGI_ID]
+final_data[, total_no_match_guild := sum(compare_guild == "incorrect_guild"), by = exp_JGI_ID]
+final_data[, percentage_guild_match := total_match_guild/number_alignments*100, by = exp_JGI_ID]
+
+percentage_life_style_match_myc <- final_data[, .SD[1], by = exp_JGI_ID] # Sélection d'une ligne par génome
+life_style <- percentage_life_style_match_myc[, .(exp_JGI_ID, percentage_life_style_match, percentage_guild_match)] # Sélection des colonnes pertinentes pour la table de taxonomie
+
+# sorting TAXONOMY
+correct_data <- diamond[, gene_count := 1][, c("jgi", "exp_JGI_ID", "ref_ID", "ref_descr") := tstrsplit(Myc_contig, "|", fixed=TRUE)] # Ajout de la colonne gene_count avec une valeur de 1 pour chaque ligne et séparation de Myc_contig
+correct_data <- merge(correct_data, fungal, by = "exp_JGI_ID", all.x = TRUE) # Fusion avec fungal par exp_JGI_ID
+correct_data[, compare_tax := fifelse(is.na(pred_Phylum), "NoHit", fifelse(pred_Genus == Genus, "correct_genus", fifelse(pred_Family == Family, "correct_family", fifelse(pred_Order == Order, "correct_order", fifelse(pred_Class == Class, "correct_class", fifelse(pred_Phylum == Phylum, "correct_phylum", "NO_TAXONOMIC_MATCH"))))))]
+correct_data[, .(exp_JGI_ID, compare_tax, gene_count)]
+correct_data <- correct_data[, .(exp_JGI_ID, compare_tax, gene_count, genome_gene_number = sum(gene_count)), by = .(exp_JGI_ID)]
+correct_data <- correct_data[, .(count = .N), by = .(exp_JGI_ID, compare_tax, genome_gene_number)] # Comptage du nombre de gènes par génome et par niveau taxonomique
+correct_data <- dcast(correct_data, exp_JGI_ID + genome_gene_number ~ compare_tax, value.var = "count", fill = 0) # Pivotement des données
+
+# Percentages calculation
+correct_data[, genus := ifelse(exists("correct_genus"), correct_genus / genome_gene_number * 100, 0), by = .(exp_JGI_ID)]
+correct_data[, family := ifelse(exists("correct_family"), correct_family / genome_gene_number * 100 + genus, genus), by = .(exp_JGI_ID)]
+correct_data[, order := ifelse(exists("correct_order"), correct_order / genome_gene_number * 100 + family, family), by = .(exp_JGI_ID)]
+correct_data[, class := ifelse(exists("correct_class"), correct_class / genome_gene_number * 100 + order, order), by = .(exp_JGI_ID)]
+correct_data[, phylum := ifelse(exists("correct_phylum"), correct_phylum / genome_gene_number * 100 + class, class), by = .(exp_JGI_ID)]
+correct_data[, noHit := ifelse(exists("NoHit"), NoHit / genome_gene_number * 100, 0), by = .(exp_JGI_ID)]
+correct_data[, no_taxonomic_match := ifelse(exists("NO_TAXONOMIC_MATCH"), NO_TAXONOMIC_MATCH / genome_gene_number * 100, 0), by = .(exp_JGI_ID)]
+
+# Join with life_style
+correct_data <- merge(correct_data, life_style, by = "exp_JGI_ID", all.x = TRUE)
+
+# Data reorganization
+correct_data <- correct_data[, .(exp_JGI_ID, genus, family, order, class, phylum, noHit, no_taxonomic_match, percentage_life_style_match, percentage_guild_match)]
+correct_data <- melt(correct_data, id.vars = "exp_JGI_ID", variable.name = "compare_tax", value.name = "relative")
+
+### KOG and SigP
+
+# Read KOG data
+diamond_KOG <- fread("/home/mbourema/mycocosm2024/mycocosm2024_purified/all_KOG_filtered", header = TRUE, sep = "\t")
+
+# Calculation of KOG percentages of prediction
+diamond_KOG_separated <- diamond_KOG[!kogdefline %in% "Unknown"][, c("db", "JGI_ID", "ID", "descr") := tstrsplit(contig, "|", fixed = TRUE, fill =NA, keep=c(1,2,3,4))
+][, count := 1][, total_count := sum(count), by = .(JGI_ID)
+][, number_good_predicted_kogdefline := fifelse(kogdefline == Pred_kogdefline, 1, 0)
+][, percentage_good_prediction_kogdefline := (sum(number_good_predicted_kogdefline) / total_count) * 100, by = .(JGI_ID)
+][, number_bad_predicted_kogdefline := fifelse(kogdefline != Pred_kogdefline & Pred_kogdefline != "Unknown" & Pred_kogdefline != "NoHit", 1, 0)
+][, percentage_wrong_prediction_kogdefline := (sum(number_bad_predicted_kogdefline) / total_count) * 100, by = .(JGI_ID)
+][, number_no_kogdefline_predicted := fifelse(Pred_kogdefline == "Unknown" | Pred_kogdefline == "NoHit", 1, 0)][, percentage_no_kogdefline_predicted := (sum(number_no_kogdefline_predicted) / total_count) * 100, by = .(JGI_ID)
+][, .(JGI_ID, percentage_good_prediction_kogdefline, percentage_wrong_prediction_kogdefline, percentage_no_kogdefline_predicted)][!duplicated(JGI_ID)]
+
+# Read SigP data
+diamond_sigP <- fread("/home/mbourema/mycocosm2024/mycocosm2024_purified/all_SigP_filtered", header = TRUE, sep = "\t")
+
+# Calculation of SigP percentages of prediction
+diamond_sigP_separated <- diamond_sigP[, c("db", "JGI_ID", "ID", "descr") := tstrsplit(contig, "|", fixed = TRUE, fill =NA, keep=c(1,2,3,4))
+][, secreted := fifelse(hmm_signalpep_probability == "Unknown" | hmm_signalpep_probability == "NoHit" | hmm_signalpep_probability < 0.8, "Not_Secreted", "Secreted")
+][, pred_secreted := fifelse(Pred_hmm_signalpep_probability == "Unknown" | Pred_hmm_signalpep_probability == "NoHit" | Pred_hmm_signalpep_probability < 0.8, "Not_Secreted", "Secreted")
+][, secreted_count := fifelse(secreted == "Secreted", 1, 0)
+][, sum_secreted := sum(secreted_count), by = .(JGI_ID)
+][, not_secreted_count := fifelse(secreted == "Not_Secreted", 1, 0)
+][, sum_not_secreted := sum(not_secreted_count), by = .(JGI_ID)
+][, TRUE_POSITIVE_count := fifelse(secreted == "Secreted" & pred_secreted == secreted, 1, 0)
+][, pred_TRUE_POSITIVE_total_count := sum(TRUE_POSITIVE_count), by = .(JGI_ID)
+][, pred_percentage_TRUE_POSITIVE := (pred_TRUE_POSITIVE_total_count / sum_secreted) * 100
+][, TRUE_NEGATIVE_count := fifelse(secreted == "Not_Secreted" & pred_secreted == secreted, 1, 0)
+][, pred_TRUE_NEGATIVE_total_count := sum(TRUE_NEGATIVE_count), by = .(JGI_ID)
+][, pred_percentage_TRUE_NEGATIVE := (pred_TRUE_NEGATIVE_total_count / sum_not_secreted) * 100
+][, FALSE_POSITIVE_count := fifelse(pred_secreted == "Secreted" & secreted == "Not_Secreted", 1, 0)
+][, pred_FALSE_POSITIVE_total_count := sum(FALSE_POSITIVE_count), by = .(JGI_ID)
+][, pred_percentage_FALSE_POSITIVE := (pred_FALSE_POSITIVE_total_count / sum_not_secreted) * 100
+][, FALSE_NEGATIVE_count := fifelse(pred_secreted == "Not_Secreted" & secreted == "Secreted", 1, 0)
+][, pred_FALSE_NEGATIVE_total_count := sum(FALSE_NEGATIVE_count), by = .(JGI_ID)
+][, pred_percentage_FALSE_NEGATIVE := (pred_FALSE_NEGATIVE_total_count / sum_secreted) * 100
+][, .(JGI_ID, pred_percentage_TRUE_POSITIVE, pred_percentage_TRUE_NEGATIVE, pred_percentage_FALSE_POSITIVE, pred_percentage_FALSE_NEGATIVE)
+][!duplicated(JGI_ID)]
+
+# Calculation of the number of proteins with an unknown KOG defline despite being secreted 
+diamond_KOG_sigP <- merge(diamond_KOG, diamond_sigP, by = "contig")[, .(kogdefline, hmm_signalpep_probability)
+][, count := 1
+][, number := sum(count)
+][, type := fifelse(kogdefline == "Unknown" & hmm_signalpep_probability != "Unknown" & hmm_signalpep_probability >= 0.8, 1, 0)
+][, percentage_unknown_secreted := (sum(type) / number) * 100
+][, .(percentage_unknown_secreted)
+][!duplicated(percentage_unknown_secreted)]
+# Write the percentage of secreted proteines showing an unknown KOG defline 
+fwrite(diamond_KOG_sigP, file = "/home/mbourema/mycocosm2024/mycocosm2024_purified/R_script/percentage_unknown_secreted2_2", sep = "\t")
+
+
+# Pivot wider
+correct_data <- dcast(as.data.table(correct_data), exp_JGI_ID ~ compare_tax, value.var = "relative")
+
+# Left join
+correct_data <- merge(correct_data, as.data.table(diamond_sigP_separated), by.x = "exp_JGI_ID", by.y = "JGI_ID", all.x = TRUE)
+correct_data <- merge(correct_data, as.data.table(diamond_KOG_separated), by.x = "exp_JGI_ID", by.y = "JGI_ID", all.x = TRUE)
+
+# Pivot longer
+correct_data_long <- melt(correct_data, 
+                          id.vars = "exp_JGI_ID",
+                          variable.name = "Compare_tax",
+                          value.name = "Percentages")
+
+# Write the final table
+fwrite(correct_data_long, file = "/home/mbourema/mycocosm2024/mycocosm2024_purified/R_script/percentages_taxo_guild_function_unknown_data.table", sep = "\t")
