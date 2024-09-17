@@ -80,7 +80,7 @@ Copci_AmutBmut1 contains 3 files, a duplicate for the cds file, but while one ha
 
 Eryha1 contains 4 files, 2 cds and 2 aa, with nomclatures specifying diploid or haploid. We take the diploid files.
 
-# Order of use of scripts
+# Order of use for the scripts
 
 ## copy_files
 
