@@ -1,6 +1,6 @@
 ###############################################################################################################################################################################
 # From the repertories generated and filled by the script copy_create.py and after a manual filtering of the folder that contains 2 or more KOG and SigP files,
-# the KOG and SigP files are copied in the all_KOG_SigP_files folder, without duplicated 
+# the KOG and SigP files are copied in the all_KOG_SigP_files folder, without duplication 
 ###############################################################################################################################################################################
 
 import os # Le module os permet d'effectuer des opérations telles que la manipulation de fichiers et de répertoires, le travail avec des chemins de fichiers et repertoires...
