@@ -1,6 +1,6 @@
 # The projet
 
-The aim of this project is to evaluate the accuracy and reliability of annotation results for unknown fungal genomes obtained via reference annotations in MycoCosm. This evaluation requires a comparison of expected annotations
+The aim of this project is to evaluate the accuracy and reliability of annotation results for unknown fungal genomes obtained via reference based annotations in MycoCosm. This evaluation requires a comparison of expected annotations
 of a genome against the annotations predicted for it by the database via a diamond blastx of its coding sequence against all the amino acid sequences of all the genomes listed in it. The approach consisted in removing each genome from the database
 and querying it against the remaining genomes in a systematic way on the entire phylogeny
 of the Fungi kingdom. From the resulting dataset, different combinations of taxonomy, guilds and functions were investigated (see Markdown).
