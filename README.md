@@ -82,7 +82,7 @@ Eryha1 contains 4 files, 2 cds and 2 aa, with nomclatures specifying diploid or 
 
 # Order of use for the scripts
 
-## copy_files
+## How to use copy script
 
 ### copy_create.py
 
@@ -143,7 +143,7 @@ the KOG annotations and the SigP annotations.
 
 This one will then from the files generated add the KOG and SigP annotations of the queries to them. It use the "transcriptID dictionnaries".
 
-## calculs_pourcentages
+## How to use calculs scripts
 
 ### transform_fungaltrait.R
 
