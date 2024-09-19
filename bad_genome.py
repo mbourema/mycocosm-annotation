@@ -1,5 +1,5 @@
 ###############################################################################################################################################################################
-# Program that browses in all diamonds outputs if some contains wrong formated queries or wrong formated hits. The list of wrong formated diamonds outputs is then printed
+# Program that browses in all diamonds outputs and checks if some contains wrong formated queries or wrong formated hits. The list of wrong formated diamonds outputs is then printed
 ###############################################################################################################################################################################
 
 import shutil # Importation of the shutil module
