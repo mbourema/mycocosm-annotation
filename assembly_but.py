@@ -1,6 +1,6 @@
 ################################################################################################################################################################################################
 #Definition of a function that browses the aa.fasta.gz files in the all_aa.fasta.gz_files directory, checks whether these files contain the string
-#{name of genome to be removed}_GeneCatalog' and assembles the files that satisfy this condition, 1000 by 1000, into a file 'all_aa_but_{name of genome to be removed}.fasta.gz', which will be
+#{name of genome to be removed}_GeneCatalog' and assembles the files that do not satisfy this condition, 1000 by 1000, into a file 'all_aa_but_{name of genome to be removed}.fasta.gz', which will be
 # will be stored in the directory specified by output_dir. Next, the function searches for the cds file of the genome to be removed and copies it to the directory specified by output_dir
 ################################################################################################################################################################################################
 
