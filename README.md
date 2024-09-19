@@ -5,7 +5,7 @@ of a genome against the annotations predicted for it by the database via a diamo
 and querying it against the remaining genomes in a systematic way on the entire phylogeny
 of the Fungi kingdom. From the resulting dataset, different combinations of taxonomy, guilds and functions were investigated (see Markdown).
 
-# Cleaning up the Mycocosm2024 database
+# Cleaning up the Mycocosm 2024 database
 ## Problematic
 
 2526 genome directories have been downloaded from the mycocosm website: 'https://mycocosm.jgi.doe.gov/mycocosm/home' in 2024. These directories include various functional annotation files, .README files, protein sequence files and nucleic sequence files.
