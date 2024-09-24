@@ -1,0 +1,1188 @@
+---
+output:
+  html_document :
+    css : styles.css 
+---
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Fiabilité de prédiction de Mycocosm 2024</title>
+<link href="styles.css" rel="stylesheet" type="text/css">
+</head>
+<body style="background-color:rgba(135,206,250,0.2);">
+<h1>Fiabilité de prédiction de Mycocosm 2024</h1>
+<h2>Objet de l'étude</h2>
+<p class="Objet">Mesure de la fiabilité de prédiction des caractéristiques taxonomiques, trophiques et fonctionnelles de Mycocosm 2024 pour des génomes fongiques non contenus dans la base de données</p>
+<h3>Menu</h3>
+<nav>
+  <ul>
+    <li>
+      <a href="#Importations1">I. Données</a>
+    </li>
+  </ul>
+  <ul>
+    <li>
+      <a href="#Taxonomie">II. Taxonomie &ensp;</a>
+      <ul>
+        <li>
+          <a href="#PredGen1"> 1) Prédictions générales </a>
+            <ul>
+              <li>
+                <a href="#boxplot without closest_ref and taxonomy">a) Pourcentages de bonnes prédictions à tout les niveaux taxonomiques pour tout les taxons de MycoCosm 2024</a>
+              </li>
+              <li>
+                <a href="#boxplot without closest_ref">b) Pourcentages de bonnes prédictions à tout les niveaux taxonomiques pour tout les genres de mycocosm en fonction de leur phylum</a>
+              </li>
+              <li>
+                <a href="#boxplot without taxonomy">c) Pourcentages de bonnes prédictions à tout les niveaux taxonomiques pour tout les genres de mycocosm en fonction de leur plus proche référence taxonomique </a>
+              </li>
+              <li>
+                <a href="#boxplot without taxonomy 2"> d) Pourcentages de bonnes prédictions à tout les niveaux taxonomiques pour tous les genres selon de mycocosm le niveau de comparaison taxonomique et la plus proche référence taxonomique</a>
+              </li>
+            </ul>
+        </li>
+          <li>
+            <a href="#PrednoHit"> 2) Prédictions avec pourcentages de no_Hit </a>
+              <ul>
+                <li>
+                  <a href="#boxplot with no-hit">a) Pourcentages de bonnes prédictions taxonomiques a tout les niveaux taxonomiques en fonction de la plus proche référence taxonomique et du nombre de génomes dans les taxons</a>
+                </li>
+                <li>
+                  <a  href="#boxplot2 with no-hit">b) Pourcentages de bonnes prédictions taxonomiques a tout les niveaux taxonomiques en fonction du phylum et du nombre de génomes dans les taxons</a>
+                </li>
+              </ul>
+          </li>
+          <li>
+            <a href="#PredwnoHit"> 3) Prédictions sans pourcentages de no_Hit </a>
+              <ul>
+                <li>
+                  <a href="#boxplot without no-hit">a) Pourcentages de bonnes prédictions taxonomiques a tout les niveaux taxonomiques en fonction de la plus proche référence taxonomique et du nombre de génomes dans les taxons</a>
+                </li>
+                <li>
+                  <a  href="#boxplot2 without no-hit">b) Pourcentages de bonnes prédictions taxonomiques a tout les niveaux taxonomiques en fonction du phylum et du nombre de génomes dans les taxons</a>
+                </li>
+              </ul>
+          </li>
+          <li>
+            <a href="#Aspergillus"> 4) Aspergillus </a>
+          <ul>
+            <li>
+              <a href="#aspergillus and others">a) Pourcentages de bonnes prédictions au genre pour les génomes dont le genre est compris dans la base de données Mycocosm, en considérant les pourcentages de no-Hit, pour les genre <cite>Aspergillus</cite> et autres du phylum <cite>Ascomycota</cite></a>
+            </li>
+            <li>
+              <a href="#ascomycota_without_aspergillus">b) Pourcentages de bonnes prédictions au genre pour les génomes dont le genre est compris dans la base de données Mycocosm, en considérant les pourcentages de no-Hit, avec le genre <cite>Aspergillus</cite> non considéré dans le phylum <cite>Ascomycota</cite></a>
+            </li>
+          </ul>
+        </li>
+          <li>
+            <a href="#PredNb1"> 5) Prédiction en fonction du nombre d'occurence du genre </a>
+              <ul>
+                <li>
+                  <a href="#match_genre_en_fonction_du_nombre_genre">a) Distribution du nombre de genre en fonction du nombre de génomes que contiennent les genres</a>
+                </li>
+                <li>
+                  <a href="#match genus en fonction du nombre genre">b) Pourcentages de bonnes prédictions taxonomique en fonction du nombre de génomes présent dans la base de données</a>
+                </li>
+                <li>
+                  <a href="#boxplotsNBgenus"> c) Pourcentage de bons match au genre pour des génomes dont le genre est présent dans la base de données mycocosm en fonction du nombre d'occurence du genre</a>
+                </li>
+              </ul>
+          </li>
+      </ul>
+    </li>
+    <li>
+      <a href="#Guilde">III. Guilde &ensp;</a>
+      <ul>
+        <li>
+          <a href="#PredGen2">1) Prédictions générales </a>
+            <ul>
+              <li>
+                <a href="#boxplot_guild_without_closest_ref">a) Pourcentages de bonnes prédictions à la guilde pour tout les genres de mycocosm indépendamment de leur plus proche référence taxonomique et en fonction de leur phylum</a>
+              </li>
+              <li>
+                <a href="#boxplot guild without taxonomy">b) Pourcentages de bonnes prédictions à la guilde pour tout les genres de mycocosm indépendamment de leur taxonomie et en fonction de leur plus proche référence taxonomique</a>
+              </li>
+            </ul>
+        </li>
+        <li>
+          <a href="#PredGuildVS">2) Pourcentage de bonnes prédictions au genre versus au life-style versus à la guilde</a>
+            <ul>
+              <li>
+                <a href="#boxplot guild vs life_style">a) Pourcentage de bonnes prédictions au genre versus au life-style versus à la guilde</a>
+              </li>
+            </ul>
+        </li>
+        <li>
+          <a href="#PredGuildeGuilde">3) Pourcentages de matchs à la guilde par guilde </a>
+            <ul>
+              <li>
+                <a href="#PredGuildeGuild">a) Pourcentages de bon matchs à la guilde par guilde </a>
+              </li>
+              <li>
+                <a href="#Neveuxpas">b) Pourcentages de guilde match par guilde </a>
+              </li>
+              <li>
+                <a href="#PredGuildeGuildePhylum">c) Pourcentages de bon matchs à la guilde par guilde et par phylums  </a>
+              </li>  
+              <li>
+                <a href="#PredGuildeGuildePhylumBarplots">d) Pourcentages de bon matchs à la guilde par guilde et par phylums (barplots) </a>
+              </li>
+            </ul>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="#Functions">IV. Fonctions</a>
+      <ul>
+        <li>
+            <a href="#PredKOG">1) KOG </a>
+              <ul>
+                <li>
+                  <a href="#PredKOG1">a) Pourcentages de bonnes, mauvaises et non prédictions à la KOG defline en fonction du plus proche niveau de référence taxonomique des génomes</a>
+                </li>
+                <li>
+                  <a href="#PredKOG2">b) Pourcentages de bonnes, mauvaises et non prédictions à la KOG defline en fonction de la guilde</a>
+                </li>
+              </ul>
+          </li>
+          <li>
+            <a href="#PredSIGP">2) SIGP </a>
+              <ul>
+                <li>
+                  <a href="#PredSIGP1">a) Pourcentages de vrais positifs, vrais négatifs, faux positifs et faux négatifs à la prédiction des peptides signaux en fonction du niveau de plus proche référence taxonomique des génomes</a>
+                </li>
+                <li>
+                  <a href="#PredSIGP2">b) Pourcentages de vrais positifs, vrais négatifs, faux positifs et faux négatifs à la prédiction des peptides signaux en fonction de la guilde</a>
+                </li>
+              </ul>
+              </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+<main>
+<h4 id="Importations1"> I. Données </h4>
+  <p class="Donnees"> Importation d'un tableau <mark>data_final</mark> qui contient pour chaque génomes de la base de données ses pourcentages de matchs taxonomiques à tout les niveaux (du genre au phylum) avec les génomes de la base de données, ses pourcentages de matchs au life-style et à la guilde, de no-Hit, de non-matchs taxonomiques, ainsi que de prédictions aux fonctions <B>KOG</B> et <B>SigP</B> à l'issue d'un diamond blast.<br/> Importation de la base de données fungaltraits2024 <mark>fungal</mark> et application de la fonction <mark>transform_data</mark> pour gérer les données manquantes et mal annotées de <mark>fungal</mark>.<br/> Jointure de fungaltraits 2024 à la table de pourcentages par les identifiants des génomes <mark>JGI_ID</mark>.</br> Application de la fonction <mark>closest_ref</mark> qui ajoute une colonne <mark>closest_ref</mark> à la base de données afin de déterminer la plus proche référence taxonomque de chaque génomes.</p>
+```{r warning=FALSE, message=FALSE, eval=FALSE}
+library('tidyverse')
+library('openxlsx')
+
+data_final <- read_delim("percentages_taxo_guild_function_unknown_data.table", delim="\t") %>% rename(JGI_ID = exp_JGI_ID)
+fungal <- read_delim("JGIId2024_2fungaltraitsDec2020.txt", delim="\t")
+unknown_genomes <- read.xlsx("7 génomes.xlsx")
+"%notin%" <- Negate("%in%")
+
+### Function to transform data
+
+transform_data <- function(data) {
+  transformed_data <- data %>%
+    mutate(
+      Genus = case_when(JGI_ID %in% c("AgarPMI687_1", "Cap6580_1", "Cha5317_1", "Epi6094_1", "Inolan1", "Thiap1", "Thihy1") ~ unknown_genomes$Genus[match(JGI_ID, unknown_genomes$JGI_ID)],
+                        Genus %in% "Unclassified" ~ paste("Unclassified_", JGI_ID, sep = ""),
+                        TRUE ~ Genus),
+      Family = case_when(JGI_ID %in% c("AgarPMI687_1", "Cap6580_1", "Cha5317_1", "Epi6094_1", "Inolan1", "Thiap1", "Thihy1") ~ unknown_genomes$Family[match(JGI_ID, unknown_genomes$JGI_ID)],
+                         grepl("incertae sedis", Class) & Order == "Unclassified" & Family == "Unclassified" ~ paste(Phylum, "family incertae sedis"),
+                         !grepl("incertae sedis", Class) & Order == "Unclassified" & Family == "Unclassified" ~ paste(Class, "family incertae sedis"),
+                         !grepl("incertae sedis", Order) & Order != "Unclassified" & Family == "Unclassified" ~ paste(Order, "family incertae sedis"),
+                         TRUE ~ Family),
+      Order = case_when(JGI_ID %in% c("AgarPMI687_1", "Cap6580_1", "Cha5317_1", "Epi6094_1", "Inolan1", "Thiap1", "Thihy1") ~ unknown_genomes$Order[match(JGI_ID, unknown_genomes$JGI_ID)],
+                        grepl("incertae sedis", Class) & Order == "Unclassified" ~ paste(Phylum, "order incertae sedis"),
+                        !grepl("incertae sedis", Class) & Order == "Unclassified" ~ paste(Class, "order incertae sedis"),
+                        TRUE ~ Order),
+      Class = case_when(JGI_ID %in% c("AgarPMI687_1", "Cap6580_1", "Cha5317_1", "Epi6094_1", "Inolan1", "Thiap1", "Thihy1") ~ unknown_genomes$Class[match(JGI_ID, unknown_genomes$JGI_ID)],
+        TRUE ~ Class),
+      Phylum = case_when(JGI_ID %in% c("AgarPMI687_1", "Cap6580_1", "Cha5317_1", "Epi6094_1", "Inolan1", "Thiap1", "Thihy1") ~ unknown_genomes$Phylum[match(JGI_ID, unknown_genomes$JGI_ID)],
+        TRUE ~ Phylum)) 
+  
+  return(transformed_data)
+}
+
+closest_ref <- function(data) {
+  fungal1 <- data %>%
+    rowwise() %>%
+      mutate(
+        unique_genus = list(data$Genus[data$JGI_ID != JGI_ID]),
+        unique_family = list(data$Family[data$JGI_ID != JGI_ID]),
+        unique_order = list(data$Order[data$JGI_ID != JGI_ID]),
+        unique_class = list(data$Class[data$JGI_ID != JGI_ID]),
+        unique_phylum = list(data$Phylum[data$JGI_ID != JGI_ID])
+      ) %>%
+      mutate(
+        Closest_ref = case_when(
+          Genus %in% unique_genus ~ 'genus in mycocosm',
+          Family %in% unique_family ~ 'family in mycocosm',
+          Order %in% unique_order ~ 'order in mycocosm',
+          Class %in% unique_class ~ 'class in mycocosm',
+          Phylum %in% unique_phylum ~ 'phylum in mycocosm'
+      )) %>%
+      select(-unique_genus, -unique_family, -unique_order, -unique_class, -unique_phylum)
+  
+  return(fungal1)
+}
+
+fungal_transformed <- transform_data(fungal)
+fungal_transformed2 <- fungal_transformed
+fungal_transformed3 <- closest_ref(fungal_transformed2)
+data_complete <- data_final %>% left_join(fungal_transformed3, by="JGI_ID")  %>% select(c(JGI_ID, Compare_tax, Percentages, Genus, Phylum, Class, Order, Family, primary_lifestyle, Secondary_lifestyle, Closest_ref)) %>% filter(!is.na(JGI_ID))
+write_delim(data_complete, file = "/Users/mehdi/Desktop/data_complete", delim = "\t")
+```
+
+```{r warning=FALSE, message=FALSE}
+library('tidyverse')
+options(scipen = 999) # Désactivation de la notation scientifique pour les nombres décimaux
+data_complete <- read_delim("data_complete", delim = "\t") %>% filter(!is.na(JGI_ID))
+# Boxplots en visualisant individuellement uniquement les phylums : Ascomycota, Basidiomycota, Glomeromycota, Mortierellomycota, Mucoromycota, les autres sont classés en tant que others
+data_complete <- data_complete %>% mutate(Phylum2 = case_when(Phylum == "Ascomycota" ~ Phylum,
+                                                                   Phylum == "Basidiomycota" ~ Phylum,
+                                                                   Phylum == "Glomeromycota" ~ Phylum,
+                                                                   Phylum == "Mortierellomycota" ~ Phylum,
+                                                                   Phylum == "Mucoromycota" ~ Phylum,
+                                                                   TRUE ~ "Others"))
+# Mêmes boxplots mais en considérant les no-hit dans les pourcentages de matchs
+data_complete <- data_complete %>% 
+  group_by(JGI_ID) %>% mutate(Percentages_noHit = case_when(
+    Compare_tax == "genus" ~ (((Percentages[Compare_tax %in% "genus"])/(100 - Percentages[Compare_tax %in% "noHit"]))*100),
+    Compare_tax == "family" ~ (((Percentages[Compare_tax %in% "family"])/(100 - Percentages[Compare_tax %in% "noHit"]))*100),
+    Compare_tax == "order" ~ (((Percentages[Compare_tax %in% "order"])/(100 - Percentages[Compare_tax %in% "noHit"]))*100),
+    Compare_tax == "class" ~ (((Percentages[Compare_tax %in% "class"])/(100 - Percentages[Compare_tax %in% "noHit"]))*100),
+    Compare_tax == "phylum" ~ (((Percentages[Compare_tax %in% "phylum"])/(100 - Percentages[Compare_tax %in% "noHit"]))*100),
+    Compare_tax == "percentage_life_style_match" ~ Percentages[Compare_tax %in% "percentage_life_style_match"],
+    Compare_tax == "percentage_guild_match" ~ Percentages[Compare_tax %in% "percentage_guild_match"],
+    TRUE ~ 0)) %>% 
+  ungroup() %>% mutate(Phylum2 = case_when(Phylum %in% c("Ascomycota","Basidiomycota","Glomeromycota","Mortierellomycota","Mucoromycota") ~ Phylum, 
+                                           TRUE ~ "Others"))
+```
+
+<h4 class=Titre1 id="Taxonomie"> II. Taxonomie </h4>
+<h5 id="PredGen1">1) Prédictions générales </h5>
+<h6 id="boxplot without closest_ref and taxonomy">a) Pourcentages de bonnes prédictions à tout les niveaux taxonomiques pour tout les taxons de MycoCosm 2024 </h6>
+```{r warning=FALSE, message=FALSE, fig.width=18, fig.height=10}
+
+data_match <- data_complete %>%
+  mutate(Percentages = case_when(Closest_ref == "family in mycocosm" & Compare_tax == "genus" ~ NA_real_,
+                                 Closest_ref == "order in mycocosm" & Compare_tax == "genus" | Closest_ref == "order in mycocosm" & Compare_tax == "family" ~ NA_real_,
+                                 Closest_ref == "class in mycocosm" & Compare_tax == "genus" | Closest_ref == "class in mycocosm" & Compare_tax == "family" | Closest_ref == "class in mycocosm" & Compare_tax == "order" ~ NA_real_,
+                                 Closest_ref == "phylum in mycocosm" & Compare_tax == "genus" | Closest_ref == "phylum in mycocosm" & Compare_tax == "family" | Closest_ref == "phylum in mycocosm" & Compare_tax == "order" | Closest_ref == "phylum in mycocosm" & Compare_tax == "class" ~ NA_real_, TRUE ~ Percentages))
+
+data_match_taxo <- data_match %>% filter(Compare_tax %in% c("genus", "family", "order", "class", "phylum", "noHit")) %>% filter(!is.na(Closest_ref))
+
+data_match_taxo$Compare_tax <- factor(data_match_taxo$Compare_tax, levels = c("genus", "family", "order", "class", "phylum", "noHit"))
+
+data_match_taxo$Closest_ref <- factor(data_match_taxo$Closest_ref, levels = c("genus in mycocosm", "family in mycocosm", "order in mycocosm", "class in mycocosm", "phylum in mycocosm"))
+
+data_match_taxo_per_taxonomy <- data_match_taxo %>% select(JGI_ID, Closest_ref, Compare_tax, Percentages, Genus, Family, Order, Class, Phylum)
+
+data_match_taxonomy_genus <- data_match_taxo_per_taxonomy %>% filter(Closest_ref == "genus in mycocosm") %>% group_by(Genus, Compare_tax) %>% mutate(mean_per_genus = mean(Percentages)) %>% mutate(genus_count = 1) %>% mutate(sum_genus_count = sum(genus_count)) %>% ungroup() %>% select(JGI_ID, mean_per_genus, sum_genus_count, Compare_tax)
+
+data_match_taxonomy_family <- data_match_taxo_per_taxonomy %>% filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm"), Compare_tax != "genus") %>% group_by(Family, Compare_tax) %>% mutate(mean_per_family = mean(Percentages)) %>% mutate(family_count = 1) %>% mutate(sum_family_count = sum(family_count)) %>% ungroup() %>% select(JGI_ID, mean_per_family, sum_family_count, Compare_tax)
+
+data_match_taxonomy_order <- data_match_taxo_per_taxonomy %>% filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm", "order in mycocosm"), !Compare_tax %in% c("genus", "family")) %>% group_by(Order, Compare_tax) %>% mutate(mean_per_order = mean(Percentages)) %>% mutate(order_count = 1) %>% mutate(sum_order_count = sum(order_count)) %>% ungroup() %>% select(JGI_ID, mean_per_order, sum_order_count, Compare_tax)
+
+data_match_taxonomy_class <- data_match_taxo_per_taxonomy %>% filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm", "order in mycocosm", "class in mycocosm"), !Compare_tax %in% c("genus", "family", "order")) %>% group_by(Class, Compare_tax) %>% mutate(mean_per_class = mean(Percentages)) %>% mutate(class_count = 1) %>% mutate(sum_class_count = sum(class_count)) %>% ungroup() %>% select(JGI_ID, mean_per_class, sum_class_count, Compare_tax)
+
+data_match_taxonomy_phylum <- data_match_taxo_per_taxonomy %>% filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm", "order in mycocosm", "class in mycocosm", "phylum in mycocosm"), !Compare_tax %in% c("genus", "family", "order", "class")) %>% group_by(Phylum, Compare_tax) %>% mutate(mean_per_phylum = mean(Percentages)) %>% mutate(phylum_count = 1) %>% mutate(sum_phylum_count = sum(phylum_count)) %>% ungroup() %>% select(JGI_ID, mean_per_phylum, sum_phylum_count, Compare_tax)
+
+data_match_taxo_per_taxonomy2 <- data_match_taxo_per_taxonomy %>% left_join(data_match_taxonomy_genus, by = c("JGI_ID","Compare_tax")) %>% left_join(data_match_taxonomy_family, by = c("JGI_ID","Compare_tax")) %>%
+  left_join(data_match_taxonomy_order, by = c("JGI_ID","Compare_tax")) %>% left_join(data_match_taxonomy_class, by = c("JGI_ID","Compare_tax")) %>% left_join(data_match_taxonomy_phylum, by = c("JGI_ID","Compare_tax")) %>%
+  pivot_longer(cols=c("mean_per_genus","mean_per_family","mean_per_order","mean_per_class","mean_per_phylum"), names_to="means_per_taxonomy", values_to="Percentages_means_taxonomy") %>%
+  pivot_longer(cols=c("sum_genus_count","sum_family_count","sum_order_count","sum_class_count","sum_phylum_count"), names_to="sum_per_taxonomy", values_to="Sums") %>% mutate(category=case_when(Sums == 1 ~ "1",
+                                                                                                   Sums == 2 ~ "2",
+                                                                                                   Sums == 3 ~ "3",
+                                                                                                   Sums == 4 ~ "4",
+                                                                                                   Sums == 5 ~ "5",
+                                                                                                   Sums > 5 & Sums < 20 ~ "<20",
+                                                                                                   Sums >= 20 ~ ">=20")) %>% filter(!is.na(category)) %>% group_by(Closest_ref, Compare_tax, Percentages_means_taxonomy, category) %>% summarise()
+
+ggplot_data_match_taxo_per_genus_title <- "Percentage of good genus, family, order, class and phylum prediction for each taxon"
+
+ggplot(data=data_match_taxo_per_taxonomy2, aes(x=Compare_tax, y=Percentages_means_taxonomy)) +
+  theme_bw() +
+  geom_point(position = position_jitter(width = 0.4), mapping = (aes(color = Closest_ref, fill = Closest_ref, size=category)), alpha = 0.5) + 
+  geom_boxplot(aes(x=Compare_tax), fill = NA, outlier.shape = NA) +
+  scale_color_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","gray0"), name = "Closest taxonomic reference", labels = c("genus in mycocosm"="genus in mycocosm", "family in mycocosm"="family in mycocosm", "order in mycocosm"="order in mycocosm", "class in mycocosm"="class in mycocosm", "phylum in mycocosm"="phylum in mycocosm")) +
+  scale_shape_manual(values = c(21,22,23,24,25), name = "Closest taxonomic reference", labels = c("genus in mycocosm"="genus in mycocosm", "family in mycocosm"="family in mycocosm", "order in mycocosm"="order in mycocosm", "class in mycocosm"="class in mycocosm", "phylum in mycocosm"="phylum in mycocosm")) +
+  scale_fill_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","gray0"), name = "Closest taxonomic reference", labels = c("genus in mycocosm"="genus in mycocosm", "family in mycocosm"="family in mycocosm", "order in mycocosm"="order in mycocosm", "class in mycocosm"="class in mycocosm", "phylum in mycocosm"="phylum in mycocosm")) +
+  scale_size_manual(values = seq(1, 287), name = "Number of genomes in the taxon", breaks = c("1", "2", "3", "4", "5", "<20", ">=20")) +
+  labs(title=ggplot_data_match_taxo_per_genus_title, subtitle="Mycocosm 2024", x="Taxonomic match level", y="Percentages of matches") +
+  scale_y_continuous(breaks=seq(0,100, by=20)) +
+  theme(axis.text.x=element_blank(), plot.title=element_text(face="italic", color="#FF0000", hjust=0.5), axis.title=element_text(face="italic"), legend.title=element_text(face="italic"), panel.background = element_rect(color = "black")) +
+  facet_wrap(~Compare_tax, scale = "free_x")
+```
+<p class="Donnees"> On observe que plus il y a de génomes dans les taxons, meilleures sont les prédictions aux différents niveaux taxonomiques. Aussi les prédictions sont meilleures lorsque l'on considère de niveaux taxonomiques plus larges</p>
+<h6 id="boxplot without closest_ref">b) Pourcentages de bonnes prédictions à tout les niveaux taxonomiques pour tout les genres de mycocosm en fonction de leur phylum </h6>
+<p class="Donnees"> On considère ici les phylums les plus important, le reste a été regroupé dans la catégorie <mark>"Other"</mark></p>
+```{r warning=FALSE, message=FALSE, fig.width=11, fig.height=7}
+data_match_phylum <- data_match %>% filter(Compare_tax %in% c("genus", "family", "order", "class", "phylum", "noHit")) %>% filter(!is.na(Closest_ref)) %>% mutate(Phylum2 = case_when(Phylum == "Ascomycota" ~ Phylum,
+                                                                   Phylum == "Basidiomycota" ~ Phylum,
+                                                                   Phylum == "Glomeromycota" ~ Phylum,
+                                                                   Phylum == "Mortierellomycota" ~ Phylum,
+                                                                   Phylum == "Mucoromycota" ~ Phylum,
+                                                                   TRUE ~ "Others"))
+
+data_match_phylum$Compare_tax <- factor(data_match_phylum$Compare_tax, levels = c("genus", "family", "order", "class", "phylum", "noHit"))
+data_match_phylum$Closest_ref <- factor(data_match_phylum$Closest_ref, levels = c("genus in mycocosm", "family in mycocosm", "order in mycocosm", "class in mycocosm", "phylum in mycocosm"))
+
+data_match_phylum_per_genus <- data_match_phylum %>% select(Closest_ref, Compare_tax, Percentages, Genus, Phylum2) %>% group_by(Genus, Compare_tax) %>% mutate(mean_per_genus = mean(Percentages)) %>% select(-Percentages) %>% mutate(count = 1) %>%
+  group_by(Genus) %>% mutate(nb_genus = sum(count)/6) %>% distinct() %>% mutate(category=case_when(nb_genus == 1 ~ "1",
+                                                                                                   nb_genus == 2 ~ "2",
+                                                                                                   nb_genus == 3 ~ "3",
+                                                                                                   nb_genus == 4 ~ "4",
+                                                                                                   nb_genus == 5 ~ "5",
+                                                                                                   nb_genus > 5 & nb_genus < 20 ~ "<20",
+                                                                                                   nb_genus >= 20 ~ ">=20"))
+
+ggplot_data_match_phylum_per_genus_title <- "Percentage of good genus, family, order, class and phylum prediction for each genus and per phylums"
+
+ggplot(data=data_match_phylum_per_genus, aes(x=Compare_tax, y=mean_per_genus)) +
+  theme_bw() +
+  geom_boxplot(aes(x=Compare_tax), outlier.shape = NA) +
+  geom_point(position = position_jitter(width = 0.2), mapping=aes(color = Closest_ref, fill = Closest_ref, size=category), alpha=0.5) + # shape = Closest_ref
+  scale_color_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","gray0"), name = "Closest taxonomic reference", labels = c("genus in mycocosm"="genus in mycocosm", "family in mycocosm"="family in mycocosm", "order in mycocosm"="order in mycocosm", "class in mycocosm"="class in mycocosm", "phylum in mycocosm"="phylum in mycocosm")) +
+  scale_shape_manual(values = c(21,22,23,24,25), name = "Closest taxonomic reference", labels = c("genus in mycocosm"="genus in mycocosm", "family in mycocosm"="family in mycocosm", "order in mycocosm"="order in mycocosm", "class in mycocosm"="class in mycocosm", "phylum in mycocosm"="phylum in mycocosm")) +
+  scale_fill_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","gray0"), name = "Closest taxonomic reference", labels = c("genus in mycocosm"="genus in mycocosm", "family in mycocosm"="family in mycocosm", "order in mycocosm"="order in mycocosm", "class in mycocosm"="class in mycocosm", "phylum in mycocosm"="phylum in mycocosm")) +
+  scale_size_manual(values = seq(1, 287), name = "Number of genomes in the genus", breaks = c("1", "2", "3", "4", "5", "<20", ">=20")) +
+  labs(title=ggplot_data_match_phylum_per_genus_title, subtitle="Mycocosm 2024", x="Phylums", y="Percentage of matches") +
+  scale_y_continuous(breaks=seq(0,100, by=20)) +
+  theme(axis.text.x=element_text(angle=0, hjust=0.5), plot.title=element_text(face="italic", color="#FF0000", hjust=0.5), axis.title=element_text(face="italic"), legend.title=element_text(face="italic"), panel.background = element_rect(color = "black")) +
+  facet_wrap(~Phylum2, scale = "free_x")
+```
+<h6 id="boxplot without taxonomy">c) Pourcentages de bonnes prédictions à tout les niveaux taxonomiques pour tout les genres de mycocosm en fonction de leur plus proche référence taxonomique </h6>
+<p class="Donnees"> On peut observer que les prédictions sont meilleures à tout niveaux taxonomiques lorsque la plus proche référence taxonomique est le genre, puis la famille et ainsi de suite </p>
+```{r warning=FALSE, message=FALSE, fig.width=18, fig.height=10}
+data_match_closest <- data_match %>% filter(Compare_tax %in% c("genus", "family", "order", "class", "phylum", "noHit")) %>% filter(!is.na(Closest_ref)) %>% mutate(Phylum2 = case_when(Phylum == "Ascomycota" ~ Phylum,
+                                                                   Phylum == "Basidiomycota" ~ Phylum,
+                                                                   Phylum == "Glomeromycota" ~ Phylum,
+                                                                   Phylum == "Mortierellomycota" ~ Phylum,
+                                                                   Phylum == "Mucoromycota" ~ Phylum,
+                                                                   TRUE ~ "Others"))
+
+data_match_closest$Closest_ref <- factor(data_match_closest$Closest_ref, levels = c("genus in mycocosm", "family in mycocosm", "order in mycocosm", "class in mycocosm", "phylum in mycocosm"))
+data_match_closest$Compare_tax <- factor(data_match_closest$Compare_tax, levels = c("genus", "family", "order", "class", "phylum", "noHit"))
+
+data_match_closest_per_genus <- data_match_closest %>% select(Closest_ref, Compare_tax, Percentages, Genus, Phylum2) %>% group_by(Genus, Compare_tax) %>% mutate(mean_per_genus = mean(Percentages)) %>% select(-Percentages) %>% mutate(count = 1) %>%
+  group_by(Genus) %>% mutate(nb_genus = sum(count)/6) %>% distinct() %>% mutate(category=case_when(nb_genus == 1 ~ "1",
+                                                                                                   nb_genus == 2 ~ "2",
+                                                                                                   nb_genus == 3 ~ "3",
+                                                                                                   nb_genus == 4 ~ "4",
+                                                                                                   nb_genus == 5 ~ "5",
+                                                                                                   nb_genus > 5 & nb_genus < 20 ~ "<20",
+                                                                                                   nb_genus >= 20 ~ ">=20")) %>% filter(!is.na(mean_per_genus))
+
+ggplot_data_match_closest_per_genus_title <- "Percentage of good genus, family, order, class and phylum prediction for each genus in mycocosm and per closest taxonomic level"
+
+ggplot(data=data_match_closest_per_genus, aes(x=Compare_tax, y=mean_per_genus)) +
+  theme_bw() +
+  geom_boxplot(aes(x=Compare_tax), outlier.shape = NA) +
+  geom_point(position = position_jitter(width = 0.4), mapping=aes(color = Phylum2, fill = Phylum2, size = category), alpha = 0.5) + # shape = Phylum2
+  scale_color_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","darkmagenta","gray0"), labels = c("Ascomycota"="Ascomycota", "Basidiomycota"="Basidiomycota", "Glomeromycota"="Glomeromycota", "Mortierellomycota"="Mortierellomycota", "Mucoromycota"="Mucoromycota", "Others"="Others"), name = "Phylum") +
+  scale_fill_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","darkmagenta","gray0"), labels = c("Ascomycota"="Ascomycota", "Basidiomycota"="Basidiomycota", "Glomeromycota"="Glomeromycota", "Mortierellomycota"="Mortierellomycota", "Mucoromycota"="Mucoromycota", "Others"="Others"), name = "Phylum") +
+  scale_shape_manual(values = c(21,22,23,24,25,4), labels = c("Ascomycota"="Ascomycota", "Basidiomycota"="Basidiomycota", "Glomeromycota"="Glomeromycota", "Mortierellomycota"="Mortierellomycota", "Mucoromycota"="Mucoromycota", "Others"="Others"), name = "Phylum") +
+  scale_size_manual(values = seq(1, 287), name = "Number of genomes in the genus", breaks = c("1", "2", "3", "4", "5", "<20", ">=20")) +
+  labs(title=ggplot_data_match_closest_per_genus_title, subtitle="Mycocosm 2024", x="Closest taxonomic reference", y="Percentage of matches") +
+  theme(axis.text.x=element_text(angle=0, hjust=0.5), plot.title=element_text(face="italic", color="#FF0000", hjust=0.5), axis.title=element_text(face="italic"), legend.title=element_text(face="italic"), panel.background = element_rect(color = "black")) +
+  scale_y_continuous(breaks=seq(0,100, by=20)) +
+  facet_grid(.~Closest_ref, scales = "free_x", space="free_x")
+```
+<p class="Donnees"> On peut observer que les prédictions sont meilleures à tout niveaux taxonomiques lorsque la plus proche référence taxonomique est le genre, puis la famille et ainsi de suite </p>
+<h6 id="boxplot without taxonomy 2">d) Pourcentages de bonnes prédictions à tout les niveaux taxonomiques pour tous les genres de mycocosm selon le niveau de comparaison taxonomique et la plus proche référence taxonomique </h6>
+```{r warning=FALSE, message=FALSE, fig.width=25, fig.height=10}
+data_match_genus_per_taxonomic_level <- data_match %>% filter(Compare_tax %in% c("genus", "family", "order", "class", "phylum", "noHit")) %>% filter(!is.na(Closest_ref)) %>% mutate(Phylum2 = case_when(Phylum == "Ascomycota" ~ Phylum,
+                                                                   Phylum == "Basidiomycota" ~ Phylum,
+                                                                   Phylum == "Glomeromycota" ~ Phylum,
+                                                                   Phylum == "Mortierellomycota" ~ Phylum,
+                                                                   Phylum == "Mucoromycota" ~ Phylum,
+                                                                   TRUE ~ "Others"))
+
+
+data_match_genus_per_taxonomic_level_per_genus <- data_match_genus_per_taxonomic_level %>% select(Closest_ref, Compare_tax, Percentages, Genus, Phylum2) %>% group_by(Genus, Compare_tax) %>% mutate(mean_per_genus = mean(Percentages)) %>% select(-Percentages) %>% mutate(count = 1) %>%
+  group_by(Genus) %>% mutate(nb_genus = sum(count)/6) %>% distinct() %>% mutate(category=case_when(nb_genus == 1 ~ "1",
+                                                                                                   nb_genus == 2 ~ "2",
+                                                                                                   nb_genus == 3 ~ "3",
+                                                                                                   nb_genus == 4 ~ "4",
+                                                                                                   nb_genus == 5 ~ "5",
+                                                                                                   nb_genus > 5 & nb_genus < 20 ~ "<20",
+                                                                                                   nb_genus >= 20 ~ ">=20")) %>% filter(!is.na(mean_per_genus))
+
+data_match_genus_per_taxonomic_level_per_genus$Closest_ref <- factor(data_match_genus_per_taxonomic_level_per_genus$Closest_ref, levels = c("genus in mycocosm", "family in mycocosm", "order in mycocosm", "class in mycocosm", "phylum in mycocosm"))
+data_match_genus_per_taxonomic_level_per_genus$Compare_tax <- factor(data_match_genus_per_taxonomic_level_per_genus$Compare_tax, levels = c("genus", "family", "order", "class", "phylum", "noHit"))
+
+ggplot_data_match_genus_per_taxonomic_level_per_genus_title <- "Percentage of good genus, family, order, class and phylum prediction for each genus in mycocosm, per closest taxonomic level and taxonomic level comparison"
+
+ggplot(data=data_match_genus_per_taxonomic_level_per_genus, aes(x=Closest_ref, y=mean_per_genus)) +
+  theme_bw() +
+  geom_boxplot(aes(x=Closest_ref), outlier.shape = NA) +
+  geom_point(position = position_jitter(width = 0.4), mapping=aes(color = Phylum2, fill = Phylum2, size = category), alpha = 0.6) +# shape = Phylum2 
+  scale_color_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","darkmagenta","gray0"), labels = c("Ascomycota"="Ascomycota", "Basidiomycota"="Basidiomycota", "Glomeromycota"="Glomeromycota", "Mortierellomycota"="Mortierellomycota", "Mucoromycota"="Mucoromycota", "Others"="Others"), name = "Phylum") +
+  scale_fill_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","darkmagenta","gray0"), labels = c("Ascomycota"="Ascomycota", "Basidiomycota"="Basidiomycota", "Glomeromycota"="Glomeromycota", "Mortierellomycota"="Mortierellomycota", "Mucoromycota"="Mucoromycota", "Others"="Others"), name = "Phylum") +
+  scale_shape_manual(values = c(21,22,23,24,25,4), labels = c("Ascomycota"="Ascomycota", "Basidiomycota"="Basidiomycota", "Glomeromycota"="Glomeromycota", "Mortierellomycota"="Mortierellomycota", "Mucoromycota"="Mucoromycota", "Others"="Others"), name = "Phylum") +
+  scale_size_manual(values = seq(1, 287), name = "Number of genomes in the genus", breaks = c("1", "2", "3", "4", "5", "<20", ">=20")) +
+  labs(title=ggplot_data_match_genus_per_taxonomic_level_per_genus_title, subtitle="Mycocosm 2024", x="Closest taxonomic reference", y="Percentage of matches") +
+  theme(axis.text.x=element_text(angle=0, hjust=0.5), plot.title=element_text(face="italic", color="#FF0000", hjust=0.5), axis.title=element_text(face="italic"), legend.title=element_text(face="italic"), panel.background = element_rect(color = "black")) +
+  scale_y_continuous(breaks=seq(0,100, by=20)) +
+  facet_wrap(~Compare_tax, scales = "free_x")
+```
+
+<h5 id="PrednoHit">2) Prédictions avec pourcentages de no-Hit </h5>
+<h6 id="boxplot with no-hit">a) Pourcentages de bonnes prédictions taxonomiques a tout les niveaux taxonomiques en fonction de la plus proche référence taxonomique et du nombre de génomes dans les taxons </h6>
+```{r warning=FALSE, message=FALSE, fig.width=12, fig.height=5}
+data_match_phylum <- data_complete %>% 
+  filter(Compare_tax %in% c("genus", "family", "order", "class", "phylum", "noHit")) %>% 
+  filter(!is.na(Closest_ref)) %>%
+  mutate(Compare_tax = factor(Compare_tax, levels = c("genus", "family", "order", "class", "phylum", "noHit")),
+         Closest_ref = factor(Closest_ref, 
+                               levels = c("genus in mycocosm", "family in mycocosm", "order in mycocosm", "class in mycocosm", "phylum in mycocosm")))
+
+data_match_taxo_per_taxonomy <- data_match_phylum %>%
+  mutate(count =1) %>%
+  group_by(Closest_ref, Compare_tax, Genus, Family, Order, Class, Phylum, Phylum2) %>%
+  summarise(per_genus_percentage = mean(Percentages), genomes_counts=sum(count))
+
+data_match_taxonomy_genus <- data_match_taxo_per_taxonomy %>% 
+  filter(Closest_ref == "genus in mycocosm") %>% 
+  group_by(Genus, Compare_tax) %>% mutate(meancalc = mean(per_genus_percentage),
+                                          count = sum(genomes_counts)) %>% 
+  ungroup() %>% select(Phylum2, Genus, meancalc, per_genus_percentage, count, Compare_tax, Closest_ref)
+
+data_match_taxonomy_family <- data_match_taxo_per_taxonomy %>% 
+  filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm"), Compare_tax != "genus") %>% 
+  group_by(Family, Compare_tax) %>% mutate(meancalc = mean(per_genus_percentage),
+                                           count = sum(genomes_counts)) %>%
+  filter(Closest_ref %in% "family in mycocosm") %>% 
+  ungroup() %>% select(Phylum2, Genus, meancalc, per_genus_percentage, count, Compare_tax, Closest_ref) 
+
+data_match_taxonomy_order <- data_match_taxo_per_taxonomy %>% 
+  filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm", "order in mycocosm"), !Compare_tax %in% c("genus", "family")) %>%
+  group_by(Order, Compare_tax) %>% mutate(meancalc = mean(per_genus_percentage),
+                                          count = sum(genomes_counts)) %>%
+  filter(Closest_ref %in% "order in mycocosm") %>% 
+  ungroup() %>% select(Phylum2, Genus, meancalc, per_genus_percentage, count, Compare_tax, Closest_ref)
+
+data_match_taxonomy_class <- data_match_taxo_per_taxonomy %>% 
+  filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm", "order in mycocosm", "class in mycocosm"), 
+         !Compare_tax %in% c("genus", "family", "order")) %>% 
+  group_by(Class, Compare_tax) %>% mutate(meancalc = mean(per_genus_percentage),
+                                          count = sum(genomes_counts)) %>%
+  filter(Closest_ref %in% "class in mycocosm") %>% 
+  ungroup() %>% select(Phylum2, Genus, meancalc, per_genus_percentage, count, Compare_tax, Closest_ref)
+
+data_match_taxonomy_phylum <- data_match_taxo_per_taxonomy %>% 
+  filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm", "order in mycocosm", "class in mycocosm", "phylum in mycocosm"), 
+         !Compare_tax %in% c("genus", "family", "order", "class")) %>% 
+  group_by(Phylum, Compare_tax) %>% mutate(meancalc = mean(per_genus_percentage),
+                                            count = sum(genomes_counts)) %>%
+  filter(Closest_ref %in% "phylum in mycocosm") %>% 
+  ungroup() %>% select(Phylum2, Genus, meancalc, per_genus_percentage, count, Compare_tax, Closest_ref)
+
+data_match_taxo_per_taxonomy2 <- data_match_taxonomy_genus %>%
+  bind_rows(data_match_taxonomy_family) %>%
+  bind_rows(data_match_taxonomy_order) %>%
+  bind_rows(data_match_taxonomy_class) %>%
+  bind_rows(data_match_taxonomy_phylum) %>%
+  mutate(category=case_when(count < 5 ~ as.character(count), count < 20 ~ "<20",count >= 20 ~ ">=20"))
+
+ggplot(data=data_match_taxo_per_taxonomy2, aes(x=Compare_tax, y=per_genus_percentage)) +
+  theme_bw() +
+  geom_point(position = position_jitter(width = 0.35), mapping=aes(size = category), alpha = 0.3, color="#FF0000") + 
+  geom_boxplot(aes(x=Compare_tax), fill=NA, outlier.shape = NA, lwd=1) +
+  scale_size_manual(values = seq(1, 2.5, by=0.3), 
+                    name = "Number of genomes in the taxon", 
+                    breaks = c("2", "3", "4", "5", "<20", ">=20")) +
+  labs(title="Taxonomic prediction according to closest available reference in the database", 
+       subtitle="Mycocosm 2024", 
+       x="Taxonomic level of the prediction", y="Percentage of good taxonomic prediction") +
+  theme(axis.text.x=element_text(angle=45, hjust=1), plot.title=element_text(face="italic", color="#FF0000"), 
+        axis.title=element_text(face="italic"), 
+        legend.title=element_text(face="italic"), panel.background = element_rect(color = "black")) +
+  scale_y_continuous(breaks=seq(0,100, by=20)) +
+  facet_grid(.~ Closest_ref, scales = "free_x", space="free_x", labeller = label_wrap_gen(width=10))
+```
+<h6 id="boxplot2 with no-hit">b) Pourcentages de bonnes prédictions taxonomiques a tout les niveaux taxonomiques en fonction du phylum et du nombre de génomes dans les taxons </h6>
+```{r warning=FALSE, message=FALSE, fig.width=11, fig.height=7}
+ggplot(data=data_match_taxo_per_taxonomy2, aes(x=Compare_tax, y=per_genus_percentage)) +
+  theme_bw() +
+  geom_point(position = position_jitter(width = 0.35), mapping=aes(color = Closest_ref, fill = Closest_ref, size=category), alpha=0.4) + 
+  geom_boxplot(aes(x=Compare_tax), outlier.shape = NA, fill=NA, lwd=0.8) +
+  scale_color_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","gray0"), 
+                     name = "Closest taxonomic reference", 
+                     labels = c("genus in mycocosm"="genus in mycocosm", "family in mycocosm"="family in mycocosm", 
+                                "order in mycocosm"="order in mycocosm", "class in mycocosm"="class in mycocosm", 
+                                "phylum in mycocosm"="phylum in mycocosm")) +
+  scale_shape_manual(values = c(21,22,23,24,25), 
+                     name = "Closest taxonomic reference", 
+                     labels = c("genus in mycocosm"="genus in mycocosm", "family in mycocosm"="family in mycocosm", 
+                                "order in mycocosm"="order in mycocosm", "class in mycocosm"="class in mycocosm", 
+                                "phylum in mycocosm"="phylum in mycocosm")) +
+  scale_fill_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","gray0"), 
+                    name = "Closest taxonomic reference", 
+                    labels = c("genus in mycocosm"="genus in mycocosm", "family in mycocosm"="family in mycocosm", 
+                               "order in mycocosm"="order in mycocosm", "class in mycocosm"="class in mycocosm", 
+                               "phylum in mycocosm"="phylum in mycocosm")) +
+  scale_size_manual(name = "Number of genomes in the taxon", 
+                    values=c(1,1.3,1.6,1.9,2.2,2.5), breaks = c("2", "3", "4", "5", "<20", ">=20")) +   #values = seq(1, 287), 
+  labs(title="Percentage of good taxonomic prediction per phylum", 
+       subtitle="Mycocosm 2024", 
+       x="Taxonomic level of the prediction", y="Percentage of good taxonomic prediction") +
+  scale_y_continuous(breaks=seq(0,100, by=20)) +
+  theme(axis.text.x=element_text(angle=45, hjust=1), 
+        plot.title=element_text(face="italic", color="#FF0000"), 
+        axis.title=element_text(face="italic"), 
+        legend.title=element_text(face="italic"), panel.background = element_rect(color = "black")) +
+  facet_wrap(~Phylum2, scale = "free_x")
+```
+<h5 id="PredwnoHit">3) Prédictions sans pourcentages de no-Hit </h5>
+<h6 id="boxplot without no-hit">a) Pourcentages de bonnes prédictions taxonomiques a tout les niveaux taxonomiques en fonction de la plus proche référence taxonomique et du nombre de génomes dans les taxons </h6>
+<p class="Donnees"> Intégration du pourcentage de no-Hit dans le calcul des pourcentages de matchs taxonomiques</p>
+
+```{r warning=FALSE, message=FALSE, fig.width=18, fig.height=7}
+data_match_taxo_per_taxonomy_no_noHit <- data_complete %>% 
+  filter(Compare_tax %in% c("genus", "family", "order", "class", "phylum", "noHit")) %>% 
+  filter(!is.na(Closest_ref)) %>%
+  mutate(Compare_tax = factor(Compare_tax, levels = c("genus", "family", "order", "class", "phylum", "noHit")),
+         Closest_ref = factor(Closest_ref, 
+                               levels = c("genus in mycocosm", "family in mycocosm", "order in mycocosm", "class in mycocosm", "phylum in mycocosm")),
+         count =1) %>%
+  group_by(Closest_ref, Compare_tax, Genus, Family, Order, Class, Phylum, Phylum2) %>%
+  summarise(per_genus_percentage = mean(Percentages_noHit), genomes_counts=sum(count))
+
+data_match_taxonomy_genus_no_noHit <- data_match_taxo_per_taxonomy_no_noHit %>% 
+  filter(Closest_ref == "genus in mycocosm") %>% 
+  group_by(Genus, Compare_tax) %>% mutate(meancalc = mean(per_genus_percentage),
+                                          count = sum(genomes_counts)) %>% 
+  ungroup() %>% select(Phylum2, Genus, meancalc, per_genus_percentage, count, Compare_tax, Closest_ref)
+
+data_match_taxonomy_family_no_noHit <- data_match_taxo_per_taxonomy_no_noHit %>% 
+  filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm"), Compare_tax != "genus") %>% 
+  group_by(Family, Compare_tax) %>% mutate(meancalc = mean(per_genus_percentage),
+                                           count = sum(genomes_counts)) %>%
+  filter(Closest_ref %in% "family in mycocosm") %>% 
+  ungroup() %>% select(Phylum2, Genus, meancalc, per_genus_percentage, count, Compare_tax, Closest_ref) 
+
+data_match_taxonomy_order_no_noHit <- data_match_taxo_per_taxonomy_no_noHit %>% 
+  filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm", "order in mycocosm"), !Compare_tax %in% c("genus", "family")) %>%
+  group_by(Order, Compare_tax) %>% mutate(meancalc = mean(per_genus_percentage),
+                                          count = sum(genomes_counts)) %>%
+  filter(Closest_ref %in% "order in mycocosm") %>% 
+  ungroup() %>% select(Phylum2, Genus, meancalc, per_genus_percentage, count, Compare_tax, Closest_ref)
+
+data_match_taxonomy_class_no_noHit <- data_match_taxo_per_taxonomy_no_noHit %>% 
+  filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm", "order in mycocosm", "class in mycocosm"), 
+         !Compare_tax %in% c("genus", "family", "order")) %>% 
+  group_by(Class, Compare_tax) %>% mutate(meancalc = mean(per_genus_percentage),
+                                          count = sum(genomes_counts)) %>%
+  filter(Closest_ref %in% "class in mycocosm") %>% 
+  ungroup() %>% select(Phylum2, Genus, meancalc, per_genus_percentage, count, Compare_tax, Closest_ref)
+
+data_match_taxonomy_phylum_no_noHit <- data_match_taxo_per_taxonomy_no_noHit %>% 
+  filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm", "order in mycocosm", "class in mycocosm", "phylum in mycocosm"), 
+         !Compare_tax %in% c("genus", "family", "order", "class")) %>% 
+  group_by(Phylum, Compare_tax) %>% mutate(meancalc = mean(per_genus_percentage),
+                                            count = sum(genomes_counts)) %>%
+  filter(Closest_ref %in% "phylum in mycocosm") %>% 
+  ungroup() %>% select(Phylum2, Genus, meancalc, per_genus_percentage, count, Compare_tax, Closest_ref)
+
+data_match_taxo_per_taxonomy2_no_noHit <- data_match_taxonomy_genus_no_noHit %>%
+  bind_rows(data_match_taxonomy_family_no_noHit) %>%
+  bind_rows(data_match_taxonomy_order_no_noHit) %>%
+  bind_rows(data_match_taxonomy_class_no_noHit) %>%
+  bind_rows(data_match_taxonomy_phylum_no_noHit) %>%
+  mutate(category=case_when(count < 5 ~ as.character(count), count < 20 ~ "<20",count >= 20 ~ ">=20")) %>%
+  filter(!Compare_tax %in% "noHit")
+
+ggplot(data=data_match_taxo_per_taxonomy2_no_noHit, aes(x=Compare_tax, y=per_genus_percentage)) +
+  theme_bw() +
+  geom_point(position = position_jitter(width = 0.35), mapping=aes(size = category), alpha = 0.3, color="#FF0000") + 
+  geom_boxplot(aes(x=Compare_tax), fill=NA, outlier.shape = NA, lwd=1) +
+  scale_size_manual(values = seq(1, 2.5, by=0.3), 
+                    name = "Number of genomes in the taxon", 
+                    breaks = c("2", "3", "4", "5", "<20", ">=20")) +
+  labs(title="Taxonomic prediction according to closest available reference in the database\nGenes with a prediction only (false negatives excluded)", 
+       subtitle="Mycocosm 2024", 
+       x="Taxonomic level of the prediction", y="Percentage of good taxonomic prediction") +
+  theme(axis.text.x=element_text(angle=45, hjust=1), plot.title=element_text(face="italic", color="#FF0000"), 
+        axis.title=element_text(face="italic"), 
+        legend.title=element_text(face="italic"), panel.background = element_rect(color = "black")) +
+  scale_y_continuous(breaks=seq(0,100, by=20)) +
+  facet_grid(.~ Closest_ref, scales = "free_x", space="free_x", labeller = label_wrap_gen(width=10))
+
+```
+<h6 id="boxplot2 without no-hit">b) Pourcentages de bonnes prédictions taxonomiques a tout les niveaux taxonomiques en fonction du phylum et du nombre de génomes dans les taxons </h6>
+```{r warning=FALSE, message=FALSE, fig.width=18, fig.height=10}
+ggplot(data=data_match_taxo_per_taxonomy2_no_noHit, aes(x=Compare_tax, y=per_genus_percentage)) +
+  theme_bw() +
+  geom_point(position = position_jitter(width = 0.35), mapping=aes(color = Closest_ref, fill = Closest_ref, size=category), alpha=0.4) + 
+  geom_boxplot(aes(x=Compare_tax), outlier.shape = NA, fill=NA, lwd=0.8) +
+  scale_color_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","gray0"), 
+                     name = "Closest taxonomic reference", 
+                     labels = c("genus in mycocosm"="genus in mycocosm", "family in mycocosm"="family in mycocosm", 
+                                "order in mycocosm"="order in mycocosm", "class in mycocosm"="class in mycocosm", 
+                                "phylum in mycocosm"="phylum in mycocosm")) +
+  scale_shape_manual(values = c(21,22,23,24,25), 
+                     name = "Closest taxonomic reference", 
+                     labels = c("genus in mycocosm"="genus in mycocosm", "family in mycocosm"="family in mycocosm", 
+                                "order in mycocosm"="order in mycocosm", "class in mycocosm"="class in mycocosm", 
+                                "phylum in mycocosm"="phylum in mycocosm")) +
+  scale_fill_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","gray0"), 
+                    name = "Closest taxonomic reference", 
+                    labels = c("genus in mycocosm"="genus in mycocosm", "family in mycocosm"="family in mycocosm", 
+                               "order in mycocosm"="order in mycocosm", "class in mycocosm"="class in mycocosm", 
+                               "phylum in mycocosm"="phylum in mycocosm")) +
+  scale_size_manual(name = "Number of genomes in the taxon", 
+                    values=c(1,1.3,1.6,1.9,2.2,2.5), breaks = c("2", "3", "4", "5", "<20", ">=20")) +   #values = seq(1, 287), 
+  labs(title="Percentage of good taxonomic prediction per phylum", 
+       subtitle="Mycocosm 2024", 
+       x="Taxonomic level of the prediction", y="Percentage of good taxonomic prediction") +
+  scale_y_continuous(breaks=seq(0,100, by=20)) +
+  theme(axis.text.x=element_text(angle=45, hjust=1), 
+        plot.title=element_text(face="italic", color="#FF0000"), 
+        axis.title=element_text(face="italic"), 
+        legend.title=element_text(face="italic"), panel.background = element_rect(color = "black")) +
+  facet_wrap(~Phylum2, scale = "free_x")
+```
+
+<h5 id="Aspergillus">4) Aspergillus </h5>
+<h6 id="aspergillus and others">a) Pourcentages de bonnes prédictions au genre pour les génomes dont le genre est compris dans la base de données mycocosm, en considérant les pourcentages de no-Hit, pour les genre <cite>Aspergillus</cite> et autres du phylum <cite>Ascomycota</cite> </h6>
+<p class="Donnees"> Le phylum <cite>Ascomycota</cite> comporte 444 genres, la plupart ne contenant pas plus d'une centaine d'espèces, hormis <cite>Aspergillus</cite> qui contient 287 espèces.<br/> Les génomes du genre <cite>Aspergillus</cite> sont très bien annotés, ce qui peut causer un biais dans les pourcentages de bonnes prédictions taxonomiques du genre <cite>Ascomycota</cite>.<br/> Les pourcentages de matchs au genre pour les génomes du genre <cite>Aspergillus</cite> du phylum <cite>Ascomycota</cite> sont comparées à ceux des autres genres du phylum <cite>Ascomycota</cite>. </p>
+```{r warning=FALSE, message=FALSE, fig.width=20, fig.height=10}
+# Boxplot montrant le pourcentage de bon matchs au genre pour le genre aspergillus contre les autres genres
+data_aspergillus <- data_complete %>% mutate(Aspergillus = case_when(Genus == "Aspergillus" ~ "Aspergillus", TRUE ~ "Not Aspergillus"))
+
+data_aspergillus_phylum_no_noHit <- data_aspergillus %>% filter(Phylum %in% "Ascomycota", Compare_tax %in% "genus", Closest_ref %in% "genus in mycocosm") %>% mutate(count = 1) %>% group_by(Genus) %>% mutate(sum_genus = sum(count)) %>% mutate(category = case_when(sum_genus >= 50 ~ ">=50", TRUE ~ "<50")) %>% mutate(Genus2 = case_when(category == ">=50" ~ Genus, TRUE ~ "Others"))
+
+ggplot_data_aspergillus_phylum_no_noHit_title <- "Percentages of correct genus prediction for genomes whose genus is present in the mycocosm database, considering no_Hit, for Aspergillus and others genus in Ascomycota phylum"
+
+ggplot(data=data_aspergillus_phylum_no_noHit, aes(x=Aspergillus, y=Percentages_noHit)) +
+  theme_bw() +
+  geom_boxplot(outlier.shape = NA) +
+  geom_point(position = position_jitter(width = 0.4), mapping=aes(color = Genus2, size = category), alpha = 0.6) +
+  scale_size_manual(values = seq(1, 287), name = "Number of genomes in the genus", breaks = c("<50", ">=50")) +
+  scale_color_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","darkmagenta","gray0"), labels = c("Aspergillus"="Aspergillus", "Fusarium"="Fusarium", "Penicillium"="Penicillium", "Trichoderma"="Trichoderma", "Others"="Others"), name = "Genus") +
+  labs(title=ggplot_data_aspergillus_phylum_no_noHit_title, subtitle="Mycocosm 2024",x="Ascomycota", y="Percentage of matches with the right genus") +
+  scale_y_continuous(breaks=seq(0,100, by=20)) +
+  theme(axis.text.x=element_text(angle=0, hjust=0.5), plot.title=element_text(face="italic", color="#FF0000", hjust=0.5), axis.title=element_text(face="italic"), legend.title=element_text(face="italic"), panel.background = element_rect(color = "black"))
+```
+<h6 id="ascomycota_without_aspergillus">b) Effet des genres sur-représentés du phylum <cite>Ascomycota</cite> sur les pourcentages de bonnes prédictions au genre</h6>
+```{r warning=FALSE, message=FALSE, fig.width=18, fig.height=13}
+
+# Boxplot montrant le pourcentage de bon matchs au genre pour le genre aspergillus contre les autres genres
+data_big_ascomycota_genus_part1 <- data_complete %>%
+  filter(Phylum %in% "Ascomycota", Compare_tax %in% "genus", Closest_ref %in% "genus in mycocosm") %>% mutate(count = 1) %>%
+  group_by(Genus) %>% mutate(sum_genus = sum(count)) %>% mutate(category = case_when(sum_genus >= 50 ~ ">=50", TRUE ~ "<50")) %>%
+  mutate(Genus = case_when(category == ">=50" ~ Genus, TRUE ~ "Genus with <50 genomes")) %>%
+  mutate(Genus2 = Genus)
+data_big_ascomycota_genus_part2 <- data_big_ascomycota_genus_part1 %>%
+  mutate(Genus2 = "All Ascomycota")
+data_big_ascomycota_genus <- select(data_big_ascomycota_genus_part1, Genus, Genus2, Percentages, category) %>% 
+  bind_rows(select(data_big_ascomycota_genus_part2, Genus, Genus2, Percentages, category)) %>%
+  mutate(Genus2 = factor(Genus2, levels=c("Aspergillus","Fusarium","Penicillium","Trichoderma","Genus with <50 genomes", "All Ascomycota")),
+         Genus = factor(Genus, levels=c("Aspergillus","Fusarium","Penicillium","Trichoderma","Genus with <50 genomes")))
+
+ggplot(data=data_big_ascomycota_genus, aes(x=Genus2, y=Percentages)) +
+  theme_bw() +
+  geom_point(position = position_jitter(width = 0.4), mapping=aes(color = Genus, size = category), alpha = 0.3) +
+  geom_boxplot(outlier.shape = NA, fill=NA, lwd=1) +
+  scale_size_manual(values = seq(1, 287), name = "Number of genomes in the genus", breaks = c("<50", ">=50")) +
+  scale_color_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","gray0"), 
+                     name = "Genus") +
+  labs(title="Effect of high represented genus on Ascomycota percentages of good annotation", 
+       subtitle="Mycocosm 2024 - Ascomycota", x="", y="Percentage of good genus prediction") +
+  scale_y_continuous(breaks=seq(0,100, by=20)) +
+  theme(axis.text.x=element_text(angle=45, hjust=1), plot.title=element_text(face="italic", color="#FF0000"), axis.title=element_text(face="italic"), legend.title=element_text(face="italic"), panel.background = element_rect(color = "black"))
+```
+<h5 id="PredNb1">5) Prédiction en fonction du nombre d'occurence du genre </h5>
+<h6 id="match_genre_en_fonction_du_nombre_genre">a) Distribution du nombre de genre en fonction du nombre de génomes que contiennent les genres </h6>
+<p class="Donnees"> On obtient 601 genres ne possédant que 1 génomes dans la base de données mycocosm, ce qui signifie qu'ils ne possèdent pas de plus proche référence taxonomique au genre </p>
+```{r warning=FALSE, message=FALSE, fig.width=16, fig.height=7}
+mean_per_genus_number0 <- data_complete %>% select(Phylum, Genus, Compare_tax) %>%
+  mutate(Phylum = case_when(Phylum %in% c("Ascomycota","Basidiomycota","Glomeromycota","Mortierellomycota","Mucoromycota") ~ Phylum,
+                            TRUE ~ "Others")) %>%
+  filter(Compare_tax %in% "genus") %>% mutate(genus_count = 1) %>% 
+  group_by(Phylum, Genus) %>% mutate(sum_genus = sum(genus_count)) %>% distinct() %>% 
+  group_by(Phylum, sum_genus) %>% summarise(sum_sum_genus=sum(genus_count)+1) %>% 
+  arrange(sum_genus) %>% mutate(sum_sum_genus = as.numeric(as.character(sum_sum_genus))) 
+
+#write_delim(mean_per_genus_one_genome, file = "list_test_diamonds", delim = "\t")
+
+mean_per_genus_number0$sum_genus <- factor(mean_per_genus_number0$sum_genus, levels=unique(mean_per_genus_number0$sum_genus))
+mean_per_genus_number0$Phylum <- factor(mean_per_genus_number0$Phylum, levels=rev(unique(mean_per_genus_number0$Phylum)))
+
+ggplot_mean_per_genus_number0_title <- "Distribution of the number of genomes per genus"
+
+ggplot(data = mean_per_genus_number0) +
+  theme_bw() +
+  geom_col(aes(x=sum_genus, y=sum_sum_genus, fill=Phylum), stat = "identity") +
+  scale_fill_manual(values = rev(c("firebrick1","forestgreen","blue1","goldenrod2","darkmagenta","gray0"))) +
+  expand_limits(y = c(0, 610)) +
+  labs(title=ggplot_mean_per_genus_number0_title, subtitle="Mycocosm 2024", x="Number of genomes in the genus", y="Number of genus") +
+  theme(axis.text.x=element_text(angle=45, hjust=1), plot.title=element_text(face="italic", color="#FF0000"), 
+        axis.title=element_text(face="italic"), legend.title=element_text(face="italic"), panel.background = element_rect(color = "black"))
+```
+
+<h6 id="match genus en fonction du nombre genre">b) Pourcentages de bonnes prédictions taxonomique en fonction du nombre de génomes présent dans la base de données</h6>
+```{r warning=FALSE, message=FALSE, fig.width=6, fig.height=7}
+data_taxonomy_per_genome_count <- data_match_taxo_per_taxonomy2 %>%
+  #filter(!Compare_tax %in% "noHit") %>%
+  mutate(count_category = case_when(count <= 5 ~ count,
+                                    count <= 10 ~ 10,
+                                    count <=20 ~ 20,
+                                    count <= 50 ~ 50,
+                                    count <= 200 ~ 200,
+                                    count <= 500 ~ 500,
+                                    TRUE ~ 1000)) %>%
+  group_by(Compare_tax, Closest_ref, count_category) %>% summarise(goodpred_mean=mean(per_genus_percentage), goodpred_sd=sd(per_genus_percentage))
+
+ggplot() +
+  theme_bw() +
+  geom_hline(yintercept = 100, color = "black", linetype = "dashed", size = 0.8) +
+  geom_errorbar(data=data_taxonomy_per_genome_count, 
+                aes(x=count_category, y=goodpred_mean, ymin = goodpred_mean - goodpred_sd, ymax = goodpred_mean + goodpred_sd, color=Closest_ref),  
+                position=position_jitter(width = 0.0)) +
+  geom_smooth(data=data_match_taxo_per_taxonomy2, aes(x=count, y=per_genus_percentage, color=Closest_ref , fill=Closest_ref), method="loess", se=TRUE, alpha=0.2) +
+  scale_x_log10(breaks = c(2, 3, 5, 10, 20, 50, 100, 200, 500, 2000)) +  #, labels = c(1, 10, 100, 300)
+  scale_y_continuous(breaks = c(0, 20, 40, 60, 80, 100)) +
+  scale_fill_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","gray0")) +
+  scale_color_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","gray0")) +
+  labs(title="Percentage of good taxonomic annotation \naccording to number of genomes in the database", 
+       subtitle="Mycocosm 2024", x="Number of genomes", y="Percentage of matches with the right order") +
+  coord_cartesian(ylim = c(0,100)) + facet_wrap(~Compare_tax, ncol=2) +
+  theme(axis.text.x=element_text(angle=45, hjust=1), plot.title=element_text(face="italic", color="#FF0000"), 
+        axis.title=element_text(face="italic"), legend.title=element_text(face="italic"), panel.background = element_rect(color = "black")) 
+
+
+```
+<h6 id="boxplotsNBgenus">c) Pourcentage de bons match au genre pour des génomes dont le genre est présent dans la base de données mycocosm en fonction du nombre d'occurence du genre</h6>
+<p class="Donnees"> </p>
+```{r warning=FALSE, message=FALSE, fig.width=15, fig.height=7}
+mean_per_genus <- data_complete %>% mutate(genus_count = 1) %>% group_by(Genus, Compare_tax) %>% mutate(sum_genus_count = sum(genus_count)) %>% ungroup() %>% filter(Compare_tax == "genus", Closest_ref == "genus in mycocosm") %>%
+group_by(Genus) %>% mutate(mean_per_genus=mean(Percentages_noHit)) %>% mutate(category=case_when(sum_genus_count == 1 ~ "1",
+                                                                                                   sum_genus_count == 2 ~ "2",
+                                                                                                   sum_genus_count == 3 ~ "3",
+                                                                                                   sum_genus_count == 4 ~ "4",
+                                                                                                   sum_genus_count == 5 ~ "5",
+                                                                                                   sum_genus_count > 5 & sum_genus_count < 20 ~ "<20",
+                                                                                                   sum_genus_count >=20 ~ ">=20")) %>% ungroup() %>% select(category, mean_per_genus, Phylum2, sum_genus_count, Percentages_noHit)# %>% distinct()
+
+mean_per_genus$category <- factor(mean_per_genus$category, levels = c("1", "2", "3", "4", "5", "<20", ">=20"))
+
+mean_per_genus_title <- "Percentages of correct genus prediction for genomes whose genus is present in the mycocosm database in function of the number of genus occurence"
+
+ggplot(data=mean_per_genus, aes(x=category, y=Percentages_noHit)) +
+  theme_bw() +
+  geom_boxplot(outlier.shape = NA) +
+  geom_point(position = position_jitter(width = 0.4), size = 0.9, alpha = 0.75, mapping=aes(color = Phylum2)) +
+  scale_color_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","darkmagenta","gray0")) +
+  labs(title=mean_per_genus_title, subtitle="Mycocosm 2024", x="Number of genomes", y="Percentage of matches with the right genus", color = "Phylums") +
+  scale_y_continuous(breaks=seq(0,100, by=20)) +
+  theme(axis.text.x=element_text(angle=45, vjust=0.5), plot.title=element_text(face="italic", color="#FF0000", hjust=0.5), axis.title=element_text(face="italic"), legend.title=element_text(face="italic"), panel.background = element_rect(color = "black"))
+
+```
+<h4 class=Titre1 id="Guilde"> III. Guilde </h4>
+<h5 id="PredGen2">1) Prédictions générales </h5>
+<h6 id="boxplot_guild_without_closest_ref">a) Pourcentages de bonnes prédictions à la guilde pour tout les genres de mycocosm indépendamment de leur plus proche référence taxonomique et en fonction de leur phylum </h6>
+<p class="Donnees"> </p>
+```{r warning=FALSE, message=FALSE, fig.width=10, fig.height=7}
+data_match_guild_no_noHit <- data_complete %>% 
+  filter(Compare_tax %in% c("percentage_guild_match", "percentage_life_style_match", "genus")) %>% 
+  filter(!is.na(Closest_ref)) %>%
+  mutate(Closest_ref = factor(Closest_ref, 
+                               levels = c("genus in mycocosm", "family in mycocosm", "order in mycocosm", "class in mycocosm", "phylum in mycocosm")),
+         count =1) %>%
+  group_by(Closest_ref, Compare_tax, Genus, Family, Order, Class, Phylum, Phylum2, primary_lifestyle, Secondary_lifestyle) %>%
+  summarise(per_genus_percentage = mean(Percentages_noHit), genomes_counts=sum(count))
+
+data_match_taxonomy_genus_no_noHit <- data_match_guild_no_noHit %>% 
+  filter(Closest_ref == "genus in mycocosm") %>% 
+  group_by(Genus, Compare_tax) %>% mutate(meancalc = mean(per_genus_percentage),
+                                          count = sum(genomes_counts)) %>% 
+  ungroup() %>% select(Phylum2, Genus, meancalc, per_genus_percentage, count, Compare_tax, Closest_ref, primary_lifestyle, Secondary_lifestyle)
+
+data_match_taxonomy_family_no_noHit <- data_match_guild_no_noHit %>% 
+  filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm"), Compare_tax != "genus") %>% 
+  group_by(Family, Compare_tax) %>% mutate(meancalc = mean(per_genus_percentage),
+                                           count = sum(genomes_counts)) %>%
+  filter(Closest_ref %in% "family in mycocosm") %>% 
+  ungroup() %>% select(Phylum2, Genus, meancalc, per_genus_percentage, count, Compare_tax, Closest_ref, primary_lifestyle, Secondary_lifestyle) 
+
+data_match_taxonomy_order_no_noHit <- data_match_guild_no_noHit %>% 
+  filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm", "order in mycocosm"), !Compare_tax %in% c("genus", "family")) %>%
+  group_by(Order, Compare_tax) %>% mutate(meancalc = mean(per_genus_percentage),
+                                          count = sum(genomes_counts)) %>%
+  filter(Closest_ref %in% "order in mycocosm") %>% 
+  ungroup() %>% select(Phylum2, Genus, meancalc, per_genus_percentage, count, Compare_tax, Closest_ref, primary_lifestyle, Secondary_lifestyle)
+
+data_match_taxonomy_class_no_noHit <- data_match_guild_no_noHit %>% 
+  filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm", "order in mycocosm", "class in mycocosm"), 
+         !Compare_tax %in% c("genus", "family", "order")) %>% 
+  group_by(Class, Compare_tax) %>% mutate(meancalc = mean(per_genus_percentage),
+                                          count = sum(genomes_counts)) %>%
+  filter(Closest_ref %in% "class in mycocosm") %>% 
+  ungroup() %>% select(Phylum2, Genus, meancalc, per_genus_percentage, count, Compare_tax, Closest_ref, primary_lifestyle, Secondary_lifestyle)
+
+data_match_taxonomy_phylum_no_noHit <- data_match_guild_no_noHit %>% 
+  filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm", "order in mycocosm", "class in mycocosm", "phylum in mycocosm"), 
+         !Compare_tax %in% c("genus", "family", "order", "class")) %>% 
+  group_by(Phylum, Compare_tax) %>% mutate(meancalc = mean(per_genus_percentage),
+                                            count = sum(genomes_counts)) %>%
+  filter(Closest_ref %in% "phylum in mycocosm") %>% 
+  ungroup() %>% select(Phylum2, Genus, meancalc, per_genus_percentage, count, Compare_tax, Closest_ref, primary_lifestyle, Secondary_lifestyle)
+
+data_match_guild_no_noHit2 <- data_match_taxonomy_genus_no_noHit %>%
+  bind_rows(data_match_taxonomy_family_no_noHit) %>%
+  bind_rows(data_match_taxonomy_order_no_noHit) %>%
+  bind_rows(data_match_taxonomy_class_no_noHit) %>%
+  bind_rows(data_match_taxonomy_phylum_no_noHit) %>%
+  mutate(category=case_when(count < 5 ~ as.character(count), count < 20 ~ "<20",count >= 20 ~ ">=20")) %>%
+  filter(!Compare_tax %in% "noHit") %>%
+  mutate(Guild = case_when(primary_lifestyle %in% c("ectomycorrhizal") ~ "Ectomycorrhizal", 
+                           primary_lifestyle %in% c("soil_saprotroph","unspecified_saprotroph","litter_saprotroph","wood_saprotroph","dung_saprotroph", "fungal_decomposer") | 
+                             Secondary_lifestyle %in% c("litter_saprotroph","unspecified_saprotroph","soil_saprotroph","wood_saprotroph","fungal_decomposer", "dung_saprotroph") ~ "Saprotroph",
+                           primary_lifestyle %in% c("unspecified_pathotroph","plant_pathogen") | Secondary_lifestyle %in% c("plant_pathogen") ~ "Pathotroph", 
+                           TRUE ~ "Others")) %>%
+  mutate(Guild = factor(Guild, levels=c("Saprotroph", "Ectomycorrhizal", "Pathotroph", "Others")))
+data_match_guild_no_noHit_guild <- data_match_guild_no_noHit2 %>%
+  mutate(Phylum3 = case_when(Phylum2 %in% "Glomeromycota" ~ "Glomero\nmycota",
+                             Phylum2 %in% "Mortierellomycota" ~ "Mortierel\nlomycota",
+                             TRUE ~ Phylum2))
+
+ggplot(data=data_match_guild_no_noHit_guild, aes(x=Guild, y=per_genus_percentage)) +
+  theme_bw() +
+  geom_point(position = position_jitter(width = 0.2), alpha = 0.5, mapping=aes(color = Closest_ref, size = category)) +
+  geom_boxplot(outlier.shape = NA, fill = NA, lwd=0.8) +
+  labs(title="Percentage of good guild prediction for each guild according to Phylum", 
+       subtitle="Mycocosm 2024", x="Guild", 
+       y="Percentages of good guild prediction", color = "Level of closest reference") +
+  scale_color_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","gray0")) +
+  scale_size_manual(name = "Number of genomes in the taxon", 
+                    values=c(1,1.3,1.6,1.9,2.2,2.5), breaks = c("2", "3", "4", "5", "<20", ">=20")) +
+  theme(axis.text.x=element_text(angle=45, hjust=1), plot.title=element_text(face="italic", color="#FF0000"), 
+        axis.title=element_text(face="italic"), legend.title=element_text(face="italic"), panel.background = element_rect(color = "black")) +
+  scale_y_continuous(breaks=seq(0,100, by=20)) +
+  facet_grid(.~Phylum3, scale = "free_x", space="free_x", labeller = label_wrap_gen(width=5))
+```
+<h6 id="boxplot guild without taxonomy">b) Pourcentages de bonnes prédictions à la guilde pour tout les genres de mycocosm indépendamment de leur taxonomie et en fonction de leur plus proche référence taxonomique </h6>
+```{r warning=FALSE, message=FALSE, fig.width=8, fig.height=7}
+data_match_guild_no_noHit_guild <- data_match_guild_no_noHit2 %>%
+  filter(Compare_tax %in% "percentage_guild_match")
+
+ggplot(data=data_match_guild_no_noHit_guild, aes(x=Closest_ref, y=per_genus_percentage)) +
+  theme_bw() +
+  geom_point(position = position_jitter(width = 0.3), alpha = 0.3, mapping=aes(color = Guild, size = category)) +
+  geom_boxplot(outlier.shape = NA, fill = NA, lwd=0.8) +
+  labs(title="Percentage of good guild prediction according to closest reference", 
+       subtitle="Mycocosm 2024", x="Closest taxonomic reference", y="Percentages of good guild prediction", color = "Guild") +
+  scale_color_manual(values = c("red", "blue", "green", "black")) +
+  scale_size_manual(name = "Number of genomes in the taxon", 
+                    values=c(1,1.3,1.6,1.9,2.2,2.5), breaks = c("2", "3", "4", "5", "<20", ">=20")) +
+  theme(axis.text.x=element_text(angle=45, hjust=1), plot.title=element_text(face="italic", color="#FF0000"), 
+        axis.title=element_text(face="italic"), legend.title=element_text(face="italic"), panel.background = element_rect(color = "black")) +
+  scale_y_continuous(breaks=seq(0,100, by=20)) #+  facet_wrap(.~Closest_ref, scale = "free_x", labeller = label_wrap_gen(width=10), ncol=3)
+```
+<h5 id="PredGuildVS">2) Pourcentage de bonnes prédictions au genre versus au life-style versus à la guilde </h5>
+<h6 id="boxplot guild vs life_style"> a) Pourcentage de bonnes prédictions au genre versus au life-style versus à la guilde</h6>
+```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=5}
+data_match_guild_no_noHit2_refgenus <- data_match_guild_no_noHit2 %>%
+  filter(Closest_ref %in% "genus in mycocosm") %>%
+  mutate(Compare_tax = factor(Compare_tax, levels=c("genus","percentage_life_style_match","percentage_guild_match")))
+
+ggplot(data=data_match_guild_no_noHit2_refgenus, aes(x=Phylum2, y=per_genus_percentage)) +
+  theme_bw() +
+  geom_point(position = position_jitter(width = 0.3), alpha = 0.3, mapping=aes(color = Guild, size = category)) +
+  geom_boxplot(outlier.shape = NA, fill = NA, lwd=0.8) +
+  labs(title="Percentages of good genus, life-style and guild prediction", 
+       subtitle="Genus with at least two genomes Mycocosm 2024", 
+       x="Phylum", y="Percentages of good prediction", color = "Guild") +
+  scale_color_manual(values = c("red", "blue", "green", "black")) +
+  scale_size_manual(name = "Number of genomes in the taxon", 
+                    values=c(1,1.3,1.6,1.9,2.2,2.5), breaks = c("2", "3", "4", "5", "<20", ">=20")) +
+  theme(axis.text.x=element_text(angle=45, hjust=1), plot.title=element_text(face="italic", color="#FF0000"), 
+        axis.title=element_text(face="italic"), legend.title=element_text(face="italic"), panel.background = element_rect(color = "black")) +
+  scale_y_continuous(breaks=seq(0,100, by=20)) +
+  facet_wrap(.~Compare_tax, scale = "free_x", ncol=3, 
+             labeller = labeller(Compare_tax = c("percentage_guild_match" = "Guild match", "percentage_life_style_match" = "Life-style match", "genus"="Genus match")))
+
+```
+
+
+<h5 id="PredGuildeGuilde">3) Pourcentages de matchs à la guilde par guilde </h5>
+<h6 id="PredGuildeGuild"> a) Pourcentages de bon matchs à la guilde par guilde </h6>
+```{r warning=FALSE, message=FALSE, fid.width=18, fig.height=7}
+data_percentages_guild_life_style <- data_complete %>% select(JGI_ID, Compare_tax, Percentages_noHit) %>% filter(Compare_tax %in% "percentage_guild_match")
+
+data_complete_bis <- data_complete %>% filter(Compare_tax %in% "percentage_guild_match") %>% select(JGI_ID, primary_lifestyle, Secondary_lifestyle)
+
+data_percentages_guild_guild <- data_percentages_guild_life_style %>% left_join(data_complete_bis, by="JGI_ID") %>% mutate(Guild = case_when(primary_lifestyle %in% c("ectomycorrhizal") ~ "Ectomycorrhizal", primary_lifestyle %in% c("soil_saprotroph","unspecified_saprotroph","litter_saprotroph","wood_saprotroph","dung_saprotroph", "fungal_decomposer") | Secondary_lifestyle %in% c("litter_saprotroph","unspecified_saprotroph","soil_saprotroph","wood_saprotroph","fungal_decomposer", "dung_saprotroph") ~ "Saprotroph", primary_lifestyle %in% c("unspecified_pathotroph","plant_pathogen") | Secondary_lifestyle %in% c("plant_pathogen", "unspecified_pathotroph") ~ "Pathotroph", TRUE ~ "Others")) %>% group_by(Guild) %>% mutate(mean_per_guild=mean(Percentages_noHit)) %>% group_by(Guild, mean_per_guild) %>% summarise()
+
+data_percentages_guild_guild$Guild <- factor(data_percentages_guild_guild$Guild, levels=c("Saprotroph", "Ectomycorrhizal", "Pathotroph", "Others"))
+
+data_percentages_guild_guild_title <- "Percentages of good guild matches per guild"
+
+ggplot(data = data_percentages_guild_guild, aes(x=Guild, y=mean_per_guild, fill=Guild)) +
+  theme_bw() +
+  geom_col() +
+  scale_fill_manual(values = c("darkred", "darkblue", "darkgreen", "black")) +
+  labs(title=data_percentages_guild_guild_title, subtitle="Mycocosm 2024", x="Guild", y="Percentages of guild matches", fill="Guild") +
+  scale_y_continuous(breaks=seq(0,100, by=20)) +
+  theme(plot.title=element_text(face="italic", color="#FF0000", hjust=0.5), axis.title=element_text(face="italic"), panel.background = element_rect(color = "black"))
+```
+<p class="Donnees"> Les meilleurs prédictions de guildes sont faites pour les champignons saprotrophes, puis pour les champignons ectomycorhiziens </p>
+<h6 id="Neveuxpas"> b) Pourcentages de guilde match par guilde </h6>
+```{r warning=FALSE, message=FALSE, fid.width=15, fig.height=7}
+data_percentages_guildpred_per_guild <- read_delim("guild_percentages", delim="\t")
+
+data_percentages_guildpred_per_guild_title <- "Percentages of good guild matches per guild"
+
+data_percentages_guildpred_per_guild$Guild <- factor(data_percentages_guildpred_per_guild$Guild, levels=c("Saprotroph", "Ectomycorrhizal", "Pathotroph", "Others"))
+
+data_percentages_guildpred_per_guild$PredGuild <- factor(data_percentages_guildpred_per_guild$PredGuild, levels=c("Saprotroph", "Ectomycorrhizal", "Pathotroph", "Others"))
+
+ggplot(data = data_percentages_guildpred_per_guild) +
+  theme_bw() +
+  geom_col(aes(x=Guild, y=percentages_guild_pred_per_guild, fill=PredGuild), position = "dodge") +
+  scale_fill_manual(values = c("darkred", "darkblue", "darkgreen", "black")) +
+  labs(title=data_percentages_guildpred_per_guild_title, subtitle="Mycocosm 2024", x="Guilde", y="Percentages of guild matches", fill="Predicted Guilde") +
+  scale_y_continuous(breaks=seq(0,100, by=20)) +
+  theme(plot.title=element_text(face="italic", color="#FF0000", hjust=0.5), axis.title=element_text(face="italic"), panel.background = element_rect(color = "black"))
+
+```
+<p class="Donnees"> On peut remarquer que les génomes dont la guilde est ectomycorrhizien matchent plus à des génomes dont la guilde est saprotrophe que l'inverse </p>
+<h6 id="PredGuildeGuildePhylum"> c) Pourcentages de bon matchs à la guilde par guilde et par phylums </h6>
+<p class="Donnees">  </p>
+```{r warning=FALSE, message=FALSE, fid.width=18, fig.height=7}
+data_percentages_guild_per_phylum <- data_complete %>% select(JGI_ID, Compare_tax, Percentages_noHit, Phylum, Genus, Closest_ref) %>% filter(Compare_tax %in% "percentage_guild_match", !is.na(Closest_ref)) %>% mutate(Phylum2 = case_when(Phylum == "Ascomycota" ~ Phylum,
+                                                                   Phylum == "Basidiomycota" ~ Phylum,
+                                                                   Phylum == "Glomeromycota" ~ Phylum,
+                                                                   Phylum == "Mortierellomycota" ~ Phylum,
+                                                                   Phylum == "Mucoromycota" ~ Phylum,
+                                                                   TRUE ~ "Others"))
+
+data_percentages_guild_phylum <- data_percentages_guild_per_phylum %>% left_join(data_complete_bis, by="JGI_ID") %>% mutate(Guild = case_when(primary_lifestyle %in% c("ectomycorrhizal") ~ "Ectomycorrhizal", primary_lifestyle %in% c("soil_saprotroph","unspecified_saprotroph","litter_saprotroph","wood_saprotroph","dung_saprotroph", "fungal_decomposer") | Secondary_lifestyle %in% c("litter_saprotroph","unspecified_saprotroph","soil_saprotroph","wood_saprotroph","fungal_decomposer", "dung_saprotroph") ~ "Saprotroph", primary_lifestyle %in% c("unspecified_pathotroph","plant_pathogen") | Secondary_lifestyle %in% c("plant_pathogen", "unspecified_pathotroph") ~ "Pathotroph", TRUE ~ "Others"))
+
+data_percentages_guild_phylum$Guild <- factor(data_percentages_guild_phylum$Guild, levels=c("Saprotroph", "Ectomycorrhizal", "Pathotroph", "Others"))
+
+data_percentages_guild_per_phylum_per_genus <- data_percentages_guild_phylum %>% select(Compare_tax, Phylum2, Genus, Guild, Percentages_noHit, Closest_ref) %>% group_by(Genus, Compare_tax) %>% mutate(mean_per_genus = mean(Percentages_noHit)) %>% select(-Percentages_noHit) %>% mutate(count = 1) %>% group_by(Genus) %>% mutate(nb_genus = sum(count)) %>% distinct() %>% mutate(category=case_when(nb_genus == 1 ~ "1",
+                                                                                                   nb_genus == 2 ~ "2",
+                                                                                                   nb_genus == 3 ~ "3",
+                                                                                                   nb_genus == 4 ~ "4",
+                                                                                                   nb_genus == 5 ~ "5",
+                                                                                                   nb_genus > 5 & nb_genus < 20 ~ "<20",
+                                                                                                   nb_genus >= 20 ~ ">=20"))
+
+data_percentages_guild_per_phylum_per_genus_title <- "Percentages of good guild matches per genus, per guild and per phylum"
+
+data_percentages_guild_per_phylum_per_genus$Closest_ref <- factor(data_percentages_guild_per_phylum_per_genus$Closest_ref, levels=c("genus in mycocosm", "family in mycocosm", "order in mycocosm", "class in mycocosm", "phylum in mycocosm"))
+
+ggplot(data = data_percentages_guild_per_phylum_per_genus, aes(x=Guild, y=mean_per_genus)) +
+  theme_bw() +
+  geom_boxplot(outlier.shape = NA) +
+  geom_point(position = position_jitter(width = 0.2), mapping = (aes(color = Phylum2, fill = Phylum2, shape = Closest_ref, size = category)), alpha=0.5) +
+  scale_color_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","darkmagenta","gray0"), name = "Phylums", labels = c("Ascomycota"="Ascomycota", "Basidiomycota"="Basidiomycota", "Glomeromycota"="Glomeromycota", "Mortierellomycota"="Mortierellomycota", "Mucoromycota"="Mucoromycota", "Others"="Others")) +
+  scale_fill_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","darkmagenta","gray0"), name = "Phylums", labels = c("Ascomycota"="Ascomycota", "Basidiomycota"="Basidiomycota", "Glomeromycota"="Glomeromycota", "Mortierellomycota"="Mortierellomycota", "Mucoromycota"="Mucoromycota", "Others"="Others")) +
+  scale_shape_manual(values = c(21,22,23,24,25), name = "Closest taxonomic reference", labels = c("genus in mycocosm"="genus in mycocosm", "family in mycocosm"="family in mycocosm", "order in mycocosm"="order in mycocosm", "class in mycocosm"="class in mycocosm", "phylum in mycocosm"="phylum in mycocosm")) +
+  scale_size_manual(values = seq(1, 287), name = "Number of genomes in the genus", breaks = c("1", "2", "3", "4", "5", "<20", ">=20")) +
+  labs(title=data_percentages_guild_per_phylum_per_genus_title, subtitle="Mycocosm 2024", x="Phylums", y="Percentages of guild matches") +
+  scale_y_continuous(breaks=seq(0,100, by=20)) +
+  theme(plot.title=element_text(face="italic", color="#FF0000", hjust=0.5), axis.title=element_text(face="italic"), panel.background = element_rect(color = "black"))
+```
+<h6 id="PredGuildeGuildePhylumBarplots"> d) Pourcentages de bon matchs à la guilde par guilde et par phylums (barplots) </h6>
+<p class="Donnees">  </p>
+```{r warning=FALSE, message=FALSE, fid.width=25, fig.height=7}
+
+data_percentages_guild_phylum <- data_percentages_guild_per_phylum %>% left_join(data_complete_bis, by="JGI_ID") %>% mutate(Guild = case_when(primary_lifestyle %in% c("ectomycorrhizal") ~ "Ectomycorrhizal", primary_lifestyle %in% c("soil_saprotroph","unspecified_saprotroph","litter_saprotroph","wood_saprotroph","dung_saprotroph") | Secondary_lifestyle %in% c("litter_saprotroph","unspecified_saprotroph","soil_saprotroph","wood_saprotroph","fungal_decomposer") ~ "Saprotroph", primary_lifestyle %in% c("unspecified_pathotroph","plant_pathogen") | Secondary_lifestyle %in% c("plant_pathogen") ~ "Pathotroph", TRUE ~ "Others")) %>% group_by(Phylum2, Guild) %>% mutate(mean_per_guild=mean(Percentages_noHit)) %>% group_by(Guild, mean_per_guild, Phylum2) %>% summarise()
+
+data_percentages_guild_phylum$Guild <- factor(data_percentages_guild_phylum$Guild, levels=c("Saprotroph", "Ectomycorrhizal", "Pathotroph", "Others"))
+
+data_percentages_guild_phylum_title <- "Percentages of good guild matches per guild and per phylum"
+
+ggplot(data = data_percentages_guild_phylum, aes(x=Guild, y=mean_per_guild, fill=Guild)) +
+  theme_bw() +
+  geom_col() +
+  labs(title=data_percentages_guild_phylum_title, subtitle="Mycocosm 2024", x="Phylums", y="Percentages of guild matches") +
+  scale_fill_manual(values = c("darkred", "darkblue", "darkgreen", "black")) +
+  theme(plot.title=element_text(face="italic", color="#FF0000", hjust=0.5), axis.title=element_text(face="italic"), panel.background = element_rect(color = "black")) +
+  scale_y_continuous(breaks=seq(0,100, by=20)) +
+  facet_wrap(~Phylum2, scales = "free_x")
+```
+<h4 class=Titre1 id="Functions"> IV. Fonctions </h4>
+<h5 id="PredKOG">1) KOG </h5>
+<h6 id="PredKOG1">a) Pourcentages de bonnes, mauvaises et non prédictions à la KOG defline en fonction du plus proche niveau de référence taxonomique des génomes </h6>
+```{r warning=FALSE, message=FALSE, fid.width=25, fig.height=5}
+data_complete_fun <- data_complete %>% 
+  mutate(Phylum2 = case_when(Phylum %in% c("Ascomycota","Basidiomycota","Glomeromycota","Mortierellomycota","Mucoromycota") ~ Phylum, 
+                                           TRUE ~ "Others"))
+
+data_match_fun_pergenus <- data_complete_fun %>% 
+  filter(Compare_tax %in% c("percentage_good_prediction_kogdefline","percentage_wrong_prediction_kogdefline","percentage_no_kogdefline_predicted",
+                            "pred_percentage_TRUE_POSITIVE","pred_percentage_TRUE_NEGATIVE","pred_percentage_FALSE_POSITIVE","pred_percentage_FALSE_NEGATIVE")) %>% 
+  filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm", "order in mycocosm", "class in mycocosm", "phylum in mycocosm")) %>% 
+  filter(!is.na(Percentages)) %>%
+  mutate(count=1) %>%
+  group_by(Closest_ref, Compare_tax, Genus, Family, Order, Class, Phylum, Phylum2, primary_lifestyle, Secondary_lifestyle) %>%
+  summarise(per_genus_percentage = mean(Percentages), genomes_counts=sum(count))
+
+data_match_fun_genus_no_noHit <- data_match_fun_pergenus %>% 
+  filter(Closest_ref == "genus in mycocosm") %>% 
+  group_by(Genus, Compare_tax) %>% mutate(meancalc = mean(per_genus_percentage),
+                                          count = sum(genomes_counts)) %>% 
+  ungroup() %>% select(Phylum2, Genus, meancalc, per_genus_percentage, count, Compare_tax, Closest_ref, primary_lifestyle, Secondary_lifestyle)
+
+data_match_fun_family_no_noHit <- data_match_fun_pergenus %>% 
+  filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm"), Compare_tax != "genus") %>% 
+  group_by(Family, Compare_tax) %>% mutate(meancalc = mean(per_genus_percentage),
+                                           count = sum(genomes_counts)) %>%
+  filter(Closest_ref %in% "family in mycocosm") %>% 
+  ungroup() %>% select(Phylum2, Genus, meancalc, per_genus_percentage, count, Compare_tax, Closest_ref, primary_lifestyle, Secondary_lifestyle) 
+
+data_match_fun_order_no_noHit <- data_match_fun_pergenus %>% 
+  filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm", "order in mycocosm"), !Compare_tax %in% c("genus", "family")) %>%
+  group_by(Order, Compare_tax) %>% mutate(meancalc = mean(per_genus_percentage),
+                                          count = sum(genomes_counts)) %>%
+  filter(Closest_ref %in% "order in mycocosm") %>% 
+  ungroup() %>% select(Phylum2, Genus, meancalc, per_genus_percentage, count, Compare_tax, Closest_ref, primary_lifestyle, Secondary_lifestyle)
+
+data_match_fun_class_no_noHit <- data_match_fun_pergenus %>% 
+  filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm", "order in mycocosm", "class in mycocosm"), 
+         !Compare_tax %in% c("genus", "family", "order")) %>% 
+  group_by(Class, Compare_tax) %>% mutate(meancalc = mean(per_genus_percentage),
+                                          count = sum(genomes_counts)) %>%
+  filter(Closest_ref %in% "class in mycocosm") %>% 
+  ungroup() %>% select(Phylum2, Genus, meancalc, per_genus_percentage, count, Compare_tax, Closest_ref, primary_lifestyle, Secondary_lifestyle)
+
+data_match_fun_phylum_no_noHit <- data_match_fun_pergenus %>% 
+  filter(Closest_ref %in% c("genus in mycocosm", "family in mycocosm", "order in mycocosm", "class in mycocosm", "phylum in mycocosm"), 
+         !Compare_tax %in% c("genus", "family", "order", "class")) %>% 
+  group_by(Phylum, Compare_tax) %>% mutate(meancalc = mean(per_genus_percentage),
+                                            count = sum(genomes_counts)) %>%
+  filter(Closest_ref %in% "phylum in mycocosm") %>% 
+  ungroup() %>% select(Phylum2, Genus, meancalc, per_genus_percentage, count, Compare_tax, Closest_ref, primary_lifestyle, Secondary_lifestyle)
+
+data_match_fun_pergenus_no_noHit <- data_match_fun_genus_no_noHit %>%
+  bind_rows(data_match_fun_family_no_noHit) %>%
+  bind_rows(data_match_fun_order_no_noHit) %>%
+  bind_rows(data_match_fun_class_no_noHit) %>%
+  bind_rows(data_match_fun_phylum_no_noHit) %>%
+  mutate(category=case_when(count < 5 ~ as.character(count), count < 20 ~ "<20",count >= 20 ~ ">=20")) %>%
+  filter(!Compare_tax %in% "noHit") %>%
+  mutate(Guild = case_when(primary_lifestyle %in% c("ectomycorrhizal") ~ "Ectomycorrhizal", 
+                           primary_lifestyle %in% c("soil_saprotroph","unspecified_saprotroph","litter_saprotroph","wood_saprotroph","dung_saprotroph", "fungal_decomposer") | 
+                             Secondary_lifestyle %in% c("litter_saprotroph","unspecified_saprotroph","soil_saprotroph","wood_saprotroph","fungal_decomposer", "dung_saprotroph") ~ "Saprotroph",
+                           primary_lifestyle %in% c("unspecified_pathotroph","plant_pathogen") | Secondary_lifestyle %in% c("plant_pathogen") ~ "Pathotroph", 
+                           TRUE ~ "Others")) %>%
+  mutate(Guild = factor(Guild, levels=c("Saprotroph", "Ectomycorrhizal", "Pathotroph", "Others")),
+         Closest_ref = factor(Closest_ref, levels = c("genus in mycocosm", "family in mycocosm", "order in mycocosm", "class in mycocosm", "phylum in mycocosm")))
+
+data_match_fun_KOG_pergenus_no_noHit <- data_match_fun_pergenus_no_noHit %>%
+  filter(Compare_tax %in% c("percentage_good_prediction_kogdefline","percentage_wrong_prediction_kogdefline","percentage_no_kogdefline_predicted")) %>%
+  mutate(Compare_tax = factor(Compare_tax, levels = c("percentage_good_prediction_kogdefline","percentage_wrong_prediction_kogdefline","percentage_no_kogdefline_predicted")))
+
+ggplot(data=data_match_fun_KOG_pergenus_no_noHit, aes(x=Closest_ref, y=per_genus_percentage)) +
+  theme_bw() +
+  geom_point(position = position_jitter(width = 0.4), mapping = (aes(color = Phylum2, size=category)), alpha = 0.5) + 
+  geom_boxplot(outlier.shape = NA, fill=NA, lwd=0.8) +
+  scale_color_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","darkmagenta","gray0"), name = "Phylum") +
+  #scale_color_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","gray0"), name="Level of closest reference") +
+  scale_size_manual(name = "Number of genomes in the taxon", 
+                    values=c(1,1.3,1.6,1.9,2.2,2.5), breaks = c("2", "3", "4", "5", "<20", ">=20")) +
+  labs(title="KOG functional prediction metrics", 
+       subtitle="Mycocosm 2024", x="Level of closest reference", y="Percentages of matches") +
+  scale_y_continuous(breaks=seq(0,100, by=20)) +
+  theme(axis.text.x=element_text(angle=45, hjust=1), plot.title=element_text(face="italic", color="#FF0000"), 
+        axis.title=element_text(face="italic"), legend.title=element_text(face="italic"), panel.background = element_rect(color = "black")) +
+  facet_wrap(~Compare_tax, scale = "free", 
+             labeller = labeller(Compare_tax = c("percentage_good_prediction_kogdefline" = "Percentages of good KOG defline predictions",
+                                                 "percentage_wrong_prediction_kogdefline" = "Percentages of bad KOG defline predictions",
+                                                 "percentage_no_kogdefline_predicted" = "Percentages of no KOG defline predictions"))) 
+```
+<h6 id="PredKOG2">b) Pourcentages de bonnes, mauvaises et non prédictions à la KOG defline en fonction de la guilde </h6>
+```{r warning=FALSE, message=FALSE, fid.width=25, fig.height=5}
+library(ggpubr)
+
+abundance_tests <- compare_means(per_genus_percentage ~ Guild, data=data_match_fun_KOG_pergenus_no_noHit, group.by="Compare_tax", method="wilcox", p.adjust.method="fdr") %>% 
+  mutate(p.adj.signif=case_when(p.adj > 0.05 ~ "ns", p.adj > 0.01 ~ "*", p.adj > 0.001 ~ "**", TRUE ~ "***")) %>%
+  mutate(y_pos=c(95,65,97,75,100,95,16,22,25,25,28,16,16,22,25,25,28,16)) %>%
+  mutate(y_pos=case_when(p.adj.signif %in% "ns" ~ NA,
+                         TRUE ~ y_pos))
+
+ggplot(data=data_match_fun_KOG_pergenus_no_noHit, aes(x=Guild, y=per_genus_percentage)) +  #
+  theme_bw() +
+  geom_point(position = position_jitter(width = 0.4), mapping = (aes(color = Phylum2, size=category)), alpha = 0.5) + 
+  geom_boxplot(outlier.shape = NA, fill=NA, lwd=0.8) +
+  scale_color_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","darkmagenta","gray0"), name = "Phylum") +
+  #scale_color_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","gray0"), name="Level of closest reference") +
+  scale_size_manual(name = "Number of genomes in the taxon", 
+                    values=c(1,1.3,1.6,1.9,2.2,2.5), breaks = c("2", "3", "4", "5", "<20", ">=20")) +
+  labs(title="KOG functional prediction metrics across guilds", 
+       subtitle="Mycocosm 2024", x="Phylum", y="Percentages of matches") +
+  scale_y_continuous(breaks=seq(0,100, by=20)) +
+  theme(axis.text.x=element_text(angle=45, hjust=1), plot.title=element_text(face="italic", color="#FF0000"), 
+        axis.title=element_text(face="italic"), legend.title=element_text(face="italic"), panel.background = element_rect(color = "black")) +
+  facet_wrap(~Compare_tax, scale = "free", 
+             labeller = labeller(Compare_tax = c("percentage_good_prediction_kogdefline" = "Percentages of good KOG defline predictions",
+                                                 "percentage_wrong_prediction_kogdefline" = "Percentages of bad KOG defline predictions",
+                                                 "percentage_no_kogdefline_predicted" = "Percentages of no KOG defline predictions"))) +
+  ggsignif::geom_signif(data=abundance_tests, aes(xmin=group1, xmax=group2, annotations=p.adj.signif, y_position=y_pos), manual=TRUE, color="black", 
+                        tip_length=0.01, size=1, textsize=5)  #
+  
+```
+<h5 id="PredSIGP">1) SIGP </h5>
+<h6 id="PredSIGP1">a) Pourcentages de vrais positifs, vrais négatifs, faux positifs et faux négatifs à la prédiction des peptides signaux en fonction du niveau de plus proche référence taxonomique des génomes </h6>
+```{r warning=FALSE, message=FALSE, fid.width=18, fig.height=5}
+data_match_fun_sigP_pergenus_no_noHit <- data_match_fun_pergenus_no_noHit %>%
+  filter(Compare_tax %in% c("pred_percentage_TRUE_POSITIVE","pred_percentage_TRUE_NEGATIVE","pred_percentage_FALSE_POSITIVE","pred_percentage_FALSE_NEGATIVE")) %>%
+  mutate(sigP = case_when(Compare_tax %in% "pred_percentage_TRUE_POSITIVE" ~ "true positive",
+                          Compare_tax %in% "pred_percentage_TRUE_NEGATIVE" ~ "true negative",
+                          Compare_tax %in% "pred_percentage_FALSE_POSITIVE" ~ "false positive",
+                          Compare_tax %in% "pred_percentage_FALSE_NEGATIVE" ~ "false negative")) %>%
+  mutate(sigP = factor(sigP, levels=c("true positive","false negative","true negative","false positive")))
+
+mean_per_genus_all_sigP <- data_match_fun_sigP_pergenus_no_noHit %>%
+  mutate(category="all") %>%
+  bind_rows(data_match_fun_sigP_pergenus_no_noHit) %>%
+  mutate(category = factor(category, levels=c("all","1","2","3","4","5","<20", ">=20")))
+
+#ggplot(data=mean_per_genus_all_sigP, aes(x=category, y=per_genus_percentage)) +
+#  theme_bw() +
+#  geom_point(position = position_jitter(width = 0.4), size = 0.9, alpha = 0.75, mapping=aes(color = Phylum2)) +
+#  geom_boxplot(outlier.shape = NA, lwd=0.8, fill=NA) +
+#  scale_color_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","darkmagenta","gray0")) +
+#  labs(title="Secretion signal peptide prediction metrics", 
+#       subtitle="Genus with at least two genomes in Mycocosm 2024", x="", y="Percentage of good genus prediction", color = "Phylum") +
+#  theme(axis.text.x=element_text(angle=45, hjust=1), plot.title=element_text(face="italic", color="#FF0000"), 
+#        axis.title=element_text(face="italic"), legend.title=element_text(face="italic"), panel.background = element_rect(color = "black")) +
+#  facet_wrap(~sigP, scale = "free") 
+
+ggplot(data=data_match_fun_sigP_pergenus_no_noHit, aes(x=Closest_ref, y=per_genus_percentage)) +
+  theme_bw() +
+  geom_point(position = position_jitter(width = 0.4), size = 0.9, alpha = 0.75, mapping=aes(color = Phylum2)) +
+  geom_boxplot(outlier.shape = NA, lwd=0.8, fill=NA) +
+  scale_color_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","darkmagenta","gray0")) +
+  labs(title="Secretion signal peptide prediction metrics", 
+       subtitle="Mycocosm 2024", x="", y="Peptide signal percentage of genes", color = "Phylum") +
+  theme(axis.text.x=element_text(angle=45, hjust=1), plot.title=element_text(face="italic", color="#FF0000"), 
+        axis.title=element_text(face="italic"), legend.title=element_text(face="italic"), panel.background = element_rect(color = "black")) +
+  facet_wrap(~sigP, scale = "free", ncol=4) 
+```
+<h6 id="PredSIGP2">b) Pourcentages de vrais positifs, vrais négatifs, faux positifs et faux négatifs à la prédiction des peptides signaux en fonction de la guilde </h6>
+```{r warning=FALSE, message=FALSE, fid.width=18, fig.height=5}
+ggplot(data=data_match_fun_sigP_pergenus_no_noHit, aes(x=Guild, y=per_genus_percentage)) +
+  theme_bw() +
+  geom_point(position = position_jitter(width = 0.4), mapping = (aes(color = Phylum2, size=category)), alpha = 0.5) + 
+  geom_boxplot(outlier.shape = NA, fill=NA, lwd=0.8) +
+  scale_color_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","darkmagenta","gray0"), name = "Phylum") +
+  #scale_color_manual(values = c("firebrick1","forestgreen","blue1","goldenrod2","gray0"), name="Level of closest reference") +
+  scale_size_manual(name = "Number of genomes in the taxon", 
+                    values=c(1,1.3,1.6,1.9,2.2,2.5), breaks = c("2", "3", "4", "5", "<20", ">=20")) +
+  labs(title="Secretion signal peptide prediction metrics", 
+       subtitle="Mycocosm 2024", x="Level of closest reference", y="Percentages of matches") +
+  theme(axis.text.x=element_text(angle=45, hjust=1), plot.title=element_text(face="italic", color="#FF0000"), 
+        axis.title=element_text(face="italic"), legend.title=element_text(face="italic"), panel.background = element_rect(color = "black")) +
+  facet_wrap(~sigP, scale = "free") 
+```
+<aside>
+  <h5> </h5>
+  <p> <p>
+<aside>
+<footer>
+  <p> </p>
+</footer>
+</main>
+</body>
+</html>
