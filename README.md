@@ -164,3 +164,7 @@ functionnal prediction of all genomes
 ### transform_fungal_closest_ref.R
 
 Last script to use, to calculate a closest taxonomic reference for all the genomes
+
+# Results
+
+Results are displayed in a R Markdown, running the MycoCosm prediction file. This one needs to be in the same directory of the css sheet (styles) and the files : data_complete and guild_percentages
