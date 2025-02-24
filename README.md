@@ -80,7 +80,7 @@ It will copy from the folder all_files_fasta.gz to (path)/2_more_files.fasta.gz,
 The script is given a list of the names of the 16 directories.
 The script browses all the files in the all_files_fasta.gz folder and takes the list of sub-folders containing at least 3 fasta.gz files as parameter, and applies the copy for each item in this list. 
 At the end of its execution, it displays a variable n which is incremented by 1 with each copy and equals 65, the number of files for the 16 genome directories.
-Inspecting these directories 1 by 1, we notice that there may be several protein or nucleic files whose annotations differ by date. To qolve this, the most recent files were selected and the oldest deleted using the 'rm' command.
+Inspecting these directories 1 by 1, we notice that there may be several protein or nucleic files whose annotations differ by date. To solve this, the most recent files were selected and the oldest deleted using the 'rm' command.
 Finally, there were some exceptions:
 
 Copci_AmutBmut1 contains 3 files, a duplicate for the CDS file, but one had a nomenclature with 'cds' in lower-case and no date, the other had in his name 'CDS' in upper-case and a date matching with the aa.fasta.gz file -> we don't keep the 'cds' but the 'CDS'.
@@ -127,7 +127,7 @@ a table showing the correspondance between transcriptID and protID of all genes 
 
 ### dico_transcriptID_protID.py
 
-From this table this script will generate a dictionnary with a key for all genomes associated to all tuples of transcriptID and protID
+From this table this script will generate a dictionnary with a key for all genomes names associated to all tuples of transcriptID and protID
 
 ### order_KOG_files.R
 
